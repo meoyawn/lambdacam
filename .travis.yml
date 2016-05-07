@@ -1,0 +1,18 @@
+language: android
+jdk: oraclejdk8
+
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-23.0.3
+  - android-23
+  - extra-android-m2repository
+  - extra-google-m2repository
+
+before_install:
+  - 'export TERM=dumb'
+  - 'export JAVA_OPTS="-XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -XX:+CMSPermGenSweepingEnabled -Xmx1024m"'
+
+script: "./gradlew build"
+after_success: "./gradlew coveralls ndUpload"

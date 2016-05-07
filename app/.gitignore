@@ -1,0 +1,5 @@
+src/main/java/adeln/mediator/generated
+fabric.properties
+*.sqlite
+src/main/assets/crashlytics-build.properties
+src/main/res/values/com_crashlytics_export_strings.xml

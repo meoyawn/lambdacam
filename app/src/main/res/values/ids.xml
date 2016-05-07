@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="content" type="id" />
+    <item name="camera_texture" type="id" />
+    <item name="circles" type="id" />
+    <item name="panel" type="id" />
+    <item name="facing" type="id" />
+    <item name="shoot" type="id" />
+    <item name="cancel_circle" type="id" />
+    <item name="done_circle" type="id" />
+    <item name="flash" type="id" />
+    <item name="crop_button" type="id" />
+    <item name="crop_view" type="id" />
+    <item name="crop_overlay" type="id" />
+    <item name="wheel" type="id" />
+    <item name="degrees_text" type="id" />
+    <item name="rotate_button" type="id" />
+    <item name="cancel_text" type="id" />
+    <item name="reset_button" type="id" />
+    <item name="done_button" type="id" />
+    <item name="crop_button_panel" type="id" />
+    <item name="player_texture" type="id" />
+    <item name="player_progress" type="id" />
+    <item name="play_pause" type="id" />
+    <item name="record_duration" type="id" />
+</resources>

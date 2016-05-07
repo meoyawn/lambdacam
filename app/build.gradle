@@ -1,0 +1,79 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "redex"
+
+android {
+  compileSdkVersion targetSdk
+  buildToolsVersion buildTools
+
+  defaultConfig {
+    applicationId "adeln.telegram.camera"
+    minSdkVersion minSdk
+    // didn't have time for permissions
+    targetSdkVersion 22
+
+    versionCode 1
+    versionName "1.0.0"
+  }
+
+  dexOptions {
+    incremental true
+    maxProcessCount 4
+    javaMaxHeapSize "2g"
+  }
+
+  lintOptions {
+    lintConfig = file("lint.xml")
+    textReport true
+    textOutput "stdout"
+    disable "UnusedResources"
+  }
+
+  sourceSets.each {
+    it.java.srcDirs += "src/${it.name}/kotlin"
+  }
+
+  signingConfigs {
+    debug {
+      storeFile file("debug.keystore")
+      storePassword "android"
+      keyAlias "androiddebugkey"
+      keyPassword "android"
+    }
+  }
+
+  buildTypes {
+    debug {
+      signingConfig signingConfigs.debug
+    }
+    release {
+      minifyEnabled true
+      shrinkResources true
+      proguardFile "proguard.pro"
+      signingConfig signingConfigs.debug
+    }
+  }
+}
+
+dependencies {
+  compile kotlin.stdlib
+  compile support.v4
+  compile anko.sdk15
+
+  compile "com.squareup.flow:flow:$versions.flow"
+  compile "com.jakewharton.timber:timber:$versions.timber"
+  compile "com.facebook.rebound:rebound:0.3.8"
+  compile "com.yalantis:ucrop:1.5.0"
+
+  debugCompile "com.squareup.leakcanary:leakcanary-android:$versions.leakCanary"
+  releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$versions.leakCanary"
+}
+
+configurations {
+  compile {
+    exclude group: "com.nineoldandroids"
+    exclude module: "okhttp"
+  }
+  testCompile.exclude module: "support-annotations"
+  androidTestCompile.exclude module: "support-annotations"
+}

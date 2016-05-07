@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dark_panel">#25272a</color>
+    <color name="transparent_panel">#66000000</color>
+
+    <color name="inactive_circle">#4dffffff</color>
+    <color name="active_circle">#d9ffffff</color>
+
+    <color name="red">#cd4747</color>
+    <color name="outer_blue">#4298E0</color>
+    <color name="inner_blue">#55A9F2</color>
+
+    <color name="button_pressed">#59f0f0f0</color>
+</resources>

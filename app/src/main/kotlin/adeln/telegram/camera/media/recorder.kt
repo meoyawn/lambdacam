@@ -37,12 +37,7 @@ inline fun Context.startRecorder(fc: FacingCamera,
     setVideoSource(MediaRecorder.VideoSource.CAMERA)
     setAudioSource(MediaRecorder.AudioSource.CAMCORDER)
 
-    val cp = profile(facing.id()).apply {
-      videoCodec = MediaRecorder.VideoEncoder.MPEG_4_SP
-      audioCodec = MediaRecorder.AudioEncoder.AAC
-      fileFormat = MediaRecorder.OutputFormat.MPEG_4
-    }
-    setProfile(cp)
+    setProfile(profile(facing.id()))
 
     setOutputFile(file.absolutePath)
 

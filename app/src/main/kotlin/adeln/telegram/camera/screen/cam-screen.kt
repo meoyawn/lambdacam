@@ -6,6 +6,7 @@ import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Gesture
+import adeln.telegram.camera.LeftRight
 import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
@@ -35,7 +36,6 @@ import adeln.telegram.camera.shootButton
 import adeln.telegram.camera.switchView
 import adeln.telegram.camera.widget.FacingView
 import adeln.telegram.camera.widget.FlashView
-import adeln.telegram.camera.widget.LeftRight
 import adeln.telegram.camera.widget.ShootButton
 import adeln.telegram.camera.widget.TwoCirclesView
 import android.hardware.Camera

@@ -3,6 +3,7 @@ package adeln.telegram.camera.widget
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.R
 import adeln.telegram.camera.SPRING_SYSTEM
+import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.sharpPaint
 import android.animation.ValueAnimator
 import android.content.Context
@@ -21,25 +22,26 @@ import common.graphics.circle
 import org.jetbrains.anko.dip
 
 class ShootButton(ctx: Context) : View(ctx), SpringListener {
-  val redSpring = SPRING_SYSTEM.createSpring().apply { springConfig = SpringConfig(500.0, 12.0) }
+  private val redSpring = SPRING_SYSTEM.createSpring().apply { springConfig = SpringConfig(500.0, 12.0) }
 
-  val border = RectF()
-  val outerBlue = RectF()
-  val stopSquare = RectF()
+  private val border = RectF()
+  private val outerBlue = RectF()
+  private val stopSquare = RectF()
 
-  val whitePaint = sharpPaint(Color.WHITE)
-  val outerBluePaint = sharpPaint(ctx.color(R.color.outer_blue))
-  val innerRedPaint = sharpPaint(ctx.color(R.color.red))
-  val stopSquarePaint = sharpPaint(ctx.color(R.color.inner_blue))
+  private val whitePaint = sharpPaint(Color.WHITE)
+  private val outerBluePaint = sharpPaint(ctx.color(R.color.outer_blue))
+  private val innerRedPaint = sharpPaint(ctx.color(R.color.red))
+  private val stopSquarePaint = sharpPaint(ctx.color(R.color.inner_blue))
 
-  val maxOuterBlueRadius = dip(30).toFloat()
-  val maxInnerBlueRadius = dip(18).toFloat()
-  val maxInnerRedRadius = dip(10).toFloat()
-  val roundCorners = dip(36).toFloat()
-  val maxStopSquareRadius = dip(15).toFloat()
+  private val maxOuterBlueRadius = dip(30).toFloat()
+  private val maxInnerBlueRadius = dip(18).toFloat()
+  private val maxInnerRedRadius = dip(10).toFloat()
+  private val roundCorners = dip(36).toFloat()
+  private val maxStopSquareRadius = dip(15).toFloat()
 
-  var innerRedRadius = 0F
-  var stopSquareRadius = roundCorners
+  private var innerRedRadius = 0F
+  private var stopSquareRadius = roundCorners
+  private var mode = Mode.PICTURE
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
@@ -54,6 +56,11 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     val cx = w / 2f
     val cy = h / 2f
+//    when(mode) {
+//      Mode.PICTURE -> {
+//
+//      }
+//    }
     border.circle(cx, cy, dip(Dimens.HUGE_BUTTON_HEIGHT()) / 2F)
     outerBlue.circle(cx, cy, maxOuterBlueRadius)
     stopSquare.circle(cx, cy, maxInnerBlueRadius)
@@ -92,10 +99,37 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
     animateSmallRedRecord(from = 0f, to = maxInnerRedRadius, delay = 200L)
   }
 
+  fun setVideo() {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    val w = width
+    val top = (height - h) / 2F
+    val bw = h / 2F - maxOuterBlueRadius
+    val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
+    stopSquareRadius = roundCorners
+    stopSquarePaint.color = context.color(R.color.inner_blue)
+    border.set(0F, top, w.toFloat(), top + h)
+    stopSquare.set(w / 2f, h / 2f + top, w / 2f, h / 2f + top)
+  }
+
   fun toPicture() {
     val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(from = off, to = 0F)
     animateSmallRedRecord(from = maxInnerRedRadius, to = 0f, delay = 0L)
+  }
+
+  fun startRecording() {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    animateBorderCollapse(from = 0F, to = width / 2F)
+    animateBigRedRecord(from = maxInnerRedRadius, to = h / 2F)
+    animateWhiteRecord(from = 0f, to = maxStopSquareRadius, dur = 200L)
+  }
+
+  fun stopRecording() {
+    outerBlue.setEmpty()
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    animateBorderCollapse(from = width / 2F, to = 0F)
+    animateBigRedRecord(from = h / 2F, to = maxInnerRedRadius)
+    animateWhiteRecord(from = maxStopSquareRadius, to = 0F, dur = 0L)
   }
 
   private fun animateBlue(from: Float, to: Float) {
@@ -132,20 +166,6 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
       innerRedRadius = it
       invalidate()
     }.chainDelay(delay).start()
-  }
-
-  fun startRecording() {
-    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
-    animateBorderCollapse(from = 0F, to = width / 2F)
-    animateBigRedRecord(from = maxInnerRedRadius, to = h / 2F)
-    animateWhiteRecord(from = 0f, to = maxStopSquareRadius, dur = 200L)
-  }
-
-  fun stopRecording() {
-    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
-    animateBorderCollapse(from = width / 2F, to = 0F)
-    animateBigRedRecord(from = h / 2F, to = maxInnerRedRadius)
-    animateWhiteRecord(from = maxStopSquareRadius, to = 0F, dur = 0L)
   }
 
   private fun animateBigRedRecord(from: Float, to: Float) {

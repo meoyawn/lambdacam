@@ -20,12 +20,7 @@ import timber.log.Timber
 enum class Facing { BACK, FRONT }
 enum class Mode { PICTURE, VIDEO }
 enum class State { OPEN, CLOSING, CLOSED }
-enum class Flash {
-  AUTO,
-  ON,
-  OFF,
-  TORCH
-}
+enum class Flash { AUTO, ON, OFF, TORCH }
 
 fun Facing.id(): Int =
     when (this) {

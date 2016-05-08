@@ -1,5 +1,6 @@
 package adeln.telegram.camera.widget
 
+import adeln.telegram.camera.LeftRight
 import adeln.telegram.camera.R
 import adeln.telegram.camera.sharpPaint
 import android.animation.ValueAnimator
@@ -11,9 +12,6 @@ import common.animation.animateFloat
 import common.animation.playSequentially
 import common.context.color
 import org.jetbrains.anko.dip
-import timber.log.Timber
-
-enum class LeftRight { left, right }
 
 // TODO less animation update allocation
 class TwoCirclesView(ctx: Context) : View(ctx) {
@@ -67,8 +65,6 @@ class TwoCirclesView(ctx: Context) : View(ctx) {
 
     leftSplit.set(0F, 0F, d, d)
     rightSplit.set(w - d, 0F, w.toFloat(), d)
-
-    Timber.d("size changed with $leftRight")
 
     activePos = when (leftRight) {
       LeftRight.left  -> circleRadius

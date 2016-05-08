@@ -17,3 +17,5 @@ private fun navBarSize(d: Display): Int =
 
 fun Context.navBarSizeIfPresent(): Int =
     navBarSize(windowManager.defaultDisplay)
+
+enum class LeftRight { left, right }

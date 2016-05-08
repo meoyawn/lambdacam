@@ -7,6 +7,7 @@ import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.DEGREE_FORMAT
 import adeln.telegram.camera.FileAction
 import adeln.telegram.camera.Interpolators
+import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
@@ -113,7 +114,7 @@ fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int) {
     lparams {
       width = dip(48)
       height = frac
-      gravity = Gravity.RIGHT
+      gravity = Gravity.END
       topMargin = h + frac
       horizontalMargin = dip(10)
     }
@@ -223,10 +224,12 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
       .setInterpolator(i)
       .start()
 
-  vg.cropView().zoomOutImage(1F)
+  val cropper = vg.cropView()
+  cropper.zoomOutImage(1F)
 
-  vg.cropOverlay().alpha = 0F
-  vg.cropOverlay().animate()
+  val overlay = vg.cropOverlay()
+  overlay.alpha = 0F
+  overlay.animate()
       .alpha(1F)
       .start()
 
@@ -235,12 +238,14 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
   }
 
   vg.resetText().onClick {
-    vg.cropView().zoomOutImage(1F)
-    vg.cropView().postRotate(-vg.wheel().angle())
-    vg.cropView().setCropRect(RectF(0F, 0F, w.toFloat(), h.toFloat()))
+    cropper.postRotate(-vg.wheel().angle())
+    cropper.setCropRect(RectF(0F, 0F, w.toFloat(), h.toFloat()))
+    cropper.zoomOutImage(1F)
+
     vg.wheel().setAngle(0F)
     vg.degrees().text = formatAngle(0F)
-    vg.cropOverlay().reset()
+    overlay.reset()
+    MAIN_THREAD.postDelayed({ cropper.setCropRect(overlay.cropRect) }, 500)
   }
 
   var cropping = false
@@ -249,7 +254,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 
     cropping = true
     val f = File(telegramDir(), "${System.currentTimeMillis()}.jpg")
-    vg.cropView().cropAndSaveImage(
+    cropper.cropAndSaveImage(
         Constants.COMPRESSION_FORMAT,
         Constants.COMPRESSION_QUALITY,
         Uri.fromFile(f),

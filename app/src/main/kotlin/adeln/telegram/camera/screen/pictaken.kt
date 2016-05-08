@@ -128,6 +128,14 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
   }
 
   var bitmap: Bitmap? = if (from is CropScreen) from.bitmap else null
+
+  bitmap?.let { b ->
+    vg.cropView().postRotate(-vg.cropView().currentAngle)
+    vg.cropView().setCropRect(RectF(0F, 0F, b.width.toFloat(), b.height.toFloat()))
+    vg.cropView().zoomOutImage(1F)
+    vg.cropView().setImageToWrapCropBounds(true)
+  }
+
   if (bitmap == null) {
     BACKGROUND_THREAD.execute {
       val b = decodeRotateCut(facing, to.bytes)
@@ -138,41 +146,20 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
         vg.cameraTexture().visibility = View.GONE
 
         vg.addCropImage(b, (size.x * Constants.PIC_RATIO).toInt(), size.x)
-
-        config(to, vg, b)
       }
     }
   }
 
-  bitmap?.let { config(to, vg, it) }
-
   vg.cancel().onClick {
     Flow.get(ctx).goBack()
   }
-  vg.done().onClick {
-    // TODO done
-  }
-}
-
-fun config(to: TakenScreen, vg: _FrameLayout, bitmap: Bitmap) {
-  val cropView = vg.cropView()
-  val cs = cropView.currentScale
-  cropView.postRotate(to.angle - cropView.currentAngle)
-
-  val cvw = bitmap.width.toFloat()
-  val cvh = bitmap.height.toFloat()
-  cropView.setCropRect(RectF(0F, 0F, cvw, cvh))
-
-  val rw = to.rect.width()
-  val rh = to.rect.height()
-  val r = if (rw < rh) cvw / rw else cvh / rh
-
-  cropView.setMaxScaleMultiplier(1000F)
-  cropView.zoomInImage(r / cs, to.rect.centerX(), to.rect.centerY())
-  cropView.setImageToWrapCropBounds(true)
 
   vg.cropButton().onClick {
-    Flow.get(vg.context).push(CropScreen(bitmap, to.rect, to.angle))
+    Flow.get(vg.context).push(CropScreen(bitmap!!))
+  }
+
+  vg.done().onClick {
+    // TODO done
   }
 }
 

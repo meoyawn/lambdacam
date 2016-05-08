@@ -8,7 +8,6 @@ import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
-import adeln.telegram.camera.backAndReplace
 import adeln.telegram.camera.cropOverlayView
 import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
@@ -214,7 +213,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
       .start()
 
   vg.cropView().zoomOutImage(1F)
-  vg.cropOverlay().cropRect.set(to.rect)
+
   vg.cropOverlay().alpha = 0F
   vg.cropOverlay().animate()
       .alpha(1F)
@@ -233,16 +232,8 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
     vg.cropOverlay().reset()
   }
 
-  vg.wheel().setAngle(to.angle)
-
   vg.doneText().onClick {
-    Flow.get(ctx).backAndReplace<Screen> {
-      TakenScreen(
-          (it as TakenScreen).bytes,
-          vg.cropOverlay().cropRect,
-          vg.wheel().angle()
-      )
-    }
+    // TODO done
   }
 }
 

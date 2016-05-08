@@ -35,7 +35,6 @@ import adeln.telegram.camera.widget.FacingView
 import adeln.telegram.camera.widget.FlashView
 import adeln.telegram.camera.widget.ShootButton
 import adeln.telegram.camera.widget.TwoCirclesView
-import android.graphics.RectF
 import android.hardware.Camera
 import android.view.Gravity
 import com.facebook.rebound.SimpleSpringListener
@@ -44,7 +43,6 @@ import common.android.execute
 import common.animation.animateBackgroundColor
 import common.animation.animationEnd
 import common.context.color
-import common.context.dipF
 import common.trycatch.tryTimber
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
@@ -190,14 +188,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout) {
       Mode.PICTURE -> {
         val raw: Camera.PictureCallback? = null
         val jpeg = Camera.PictureCallback { bytes, c ->
-          val pad = dipF(Dimens.CROP_OVERLAY_INITIAL())
-          Flow.get(ctx).push(
-              TakenScreen(
-                  bytes,
-                  RectF(pad, pad, tv.width.toFloat() - pad, tv.height.toFloat() - panelSize - pad),
-                  0F
-              )
-          )
+          Flow.get(ctx).push(TakenScreen(bytes))
         }
 
         CAMERA_THREAD.execute {

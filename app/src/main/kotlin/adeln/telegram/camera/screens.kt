@@ -2,7 +2,6 @@ package adeln.telegram.camera
 
 import adeln.telegram.camera.media.stopRecorder
 import android.graphics.Bitmap
-import android.graphics.RectF
 import android.hardware.Camera
 import android.media.MediaPlayer
 import android.media.MediaRecorder
@@ -13,15 +12,11 @@ interface Screen
 object CamScreen : Screen
 
 class TakenScreen(
-    val bytes: ByteArray,
-    val rect: RectF?,
-    val angle: Float
+    val bytes: ByteArray
 ) : Screen
 
 class CropScreen(
-    val bitmap: Bitmap,
-    val rect: RectF,
-    val angle: Float
+    val bitmap: Bitmap
 ) : Screen
 
 class VideoRecording(
@@ -31,12 +26,6 @@ class VideoRecording(
     val updater: Runnable
 ) : Screen
 
-fun VideoRecording.stopRecorder() {
-  MAIN_THREAD.removeCallbacks(updater)
-  recorder.stopRecorder()
-  camera.reconnect()
-}
-
 class StopRecording(
     val rec: VideoRecording
 ) : Screen
@@ -45,6 +34,13 @@ class PlayerScreen(
     val file: File,
     val player: MediaPlayer
 ) : Screen
+
+
+fun VideoRecording.stopRecorder() {
+  MAIN_THREAD.removeCallbacks(updater)
+  recorder.stopRecorder()
+  camera.reconnect()
+}
 
 fun PlayerScreen.release() {
   player.release()

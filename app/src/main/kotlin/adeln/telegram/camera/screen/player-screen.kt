@@ -8,14 +8,14 @@ import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.FileAction
 import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.MAIN_THREAD
-import adeln.telegram.camera.MimeTypes
+import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
 import adeln.telegram.camera.media.preparePlayer
 import adeln.telegram.camera.navBarSizeIfPresent
-import adeln.telegram.camera.notifyGallery
-import adeln.telegram.camera.open
+import adeln.telegram.camera.media.notifyGallery
+import adeln.telegram.camera.media.open
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.release
 import adeln.telegram.camera.replace

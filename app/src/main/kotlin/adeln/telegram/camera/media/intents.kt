@@ -1,4 +1,4 @@
-package adeln.telegram.camera
+package adeln.telegram.camera.media
 
 import android.content.Context
 import android.content.Intent

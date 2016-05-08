@@ -6,7 +6,7 @@ import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Constants
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.MAIN_THREAD
-import adeln.telegram.camera.MimeTypes
+import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
@@ -14,8 +14,8 @@ import adeln.telegram.camera.cameraTexture
 import adeln.telegram.camera.media.decodeRotateCut
 import adeln.telegram.camera.media.telegramDir
 import adeln.telegram.camera.navBarSizeIfPresent
-import adeln.telegram.camera.notifyGallery
-import adeln.telegram.camera.open
+import adeln.telegram.camera.media.notifyGallery
+import adeln.telegram.camera.media.open
 import adeln.telegram.camera.push
 import android.graphics.Bitmap
 import android.graphics.Point

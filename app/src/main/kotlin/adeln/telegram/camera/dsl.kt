@@ -16,7 +16,7 @@ inline fun ViewManager.switchView(init: FacingView.() -> Unit) =
 inline fun ViewManager.circlesView(init: TwoCirclesView.() -> Unit) =
     ankoView({ TwoCirclesView(it) }, init)
 
-inline fun ViewManager.buttonView(init: ShootButton.() -> Unit) =
+inline fun ViewManager.shootButton(init: ShootButton.() -> Unit) =
     ankoView({ ShootButton(it) }, init)
 
 inline fun ViewManager.flashView(init: FlashView.() -> Unit) =

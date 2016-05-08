@@ -13,7 +13,6 @@ import adeln.telegram.camera.Screen
 import adeln.telegram.camera.StopRecording
 import adeln.telegram.camera.TakenScreen
 import adeln.telegram.camera.VideoRecording
-import adeln.telegram.camera.buttonView
 import adeln.telegram.camera.cameraTexture
 import adeln.telegram.camera.circlesView
 import adeln.telegram.camera.flashView
@@ -32,6 +31,7 @@ import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.push
 import adeln.telegram.camera.replace
+import adeln.telegram.camera.shootButton
 import adeln.telegram.camera.switchView
 import adeln.telegram.camera.widget.FacingView
 import adeln.telegram.camera.widget.FlashView
@@ -94,11 +94,11 @@ fun _FrameLayout.addCamButtons(panelSize: Int, cam: FacingCamera?) {
     backgroundResource = R.drawable.clickable_bg
   }
 
-  buttonView {
+  shootButton {
     id = R.id.shoot
-    val buttonHeight = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    val buttonHeight = dip(Dimens.HUGE_BUTTON_SIZE())
     lparams {
-      width = dip(90)
+      width = dip(Dimens.HUGE_BUTTON_SIZE())
       height = buttonHeight
       gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
       bottomMargin = (panelSize - navBarSize - buttonHeight) / 2 + navBarSize

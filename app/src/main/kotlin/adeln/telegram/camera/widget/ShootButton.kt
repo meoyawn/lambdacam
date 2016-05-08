@@ -1,5 +1,6 @@
 package adeln.telegram.camera.widget
 
+import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.R
 import adeln.telegram.camera.SPRING_SYSTEM
 import adeln.telegram.camera.sharpPaint
@@ -55,7 +56,7 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     val cx = w / 2f
     val cy = h / 2f
-    border.circle(cx, cy, h / 2f)
+    border.circle(cx, cy, dip(Dimens.HUGE_BUTTON_HEIGHT()) / 2F)
     outerBlue.circle(cx, cy, maxOuterBlueRadius)
     stopSquare.circle(cx, cy, maxInnerBlueRadius)
   }
@@ -88,19 +89,20 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   }
 
   fun toVideo() {
-    val off = (width - height) / 2F
+    val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(0F, to = off)
     animateSmallRedRecord(from = 0f, to = maxInnerRedRadius, delay = 200L)
   }
 
   fun toPicture() {
-    val off = (width - height) / 2F
+    val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(from = off, to = 0F)
     animateSmallRedRecord(from = maxInnerRedRadius, to = 0f, delay = 0L)
   }
 
   private fun animateBlue(from: Float, to: Float) {
-    val h = height
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    val top = (height - h) / 2F
     val w = width
     val bw = h / 2F - maxOuterBlueRadius
     val off = (w - h) / 2F
@@ -109,8 +111,8 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
     stopSquarePaint.color = context.color(R.color.inner_blue)
 
     animateFloat(from, to) { incr ->
-      border.set(off - incr, 0f, w - off + incr, h.toFloat())
-      outerBlue.set(bw + off - incr, bw, w - bw - off + incr, h - bw)
+      border.set(off - incr, top, w - off + incr, top + h)
+      outerBlue.set(bw + off - incr, bw + top, w - bw - off + incr, h - bw + top)
 
       val ratio = incr.toFloat() / off
 
@@ -118,7 +120,7 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
       outerBluePaint.alpha = a.toInt()
 
       val blueRadius = (1F - ratio) * maxInnerBlueRadius
-      stopSquare.set(w / 2f - blueRadius, h / 2f - blueRadius, w / 2f + blueRadius, h / 2f + blueRadius)
+      stopSquare.set(w / 2f - blueRadius, h / 2f - blueRadius + top, w / 2f + blueRadius, h / 2f + blueRadius + top)
 
       invalidate()
     }.start()
@@ -135,14 +137,16 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   }
 
   fun startRecording() {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
     animateBorderCollapse(from = 0F, to = width / 2F)
-    animateBigRedRecord(from = maxInnerRedRadius, to = height / 2F)
+    animateBigRedRecord(from = maxInnerRedRadius, to = h / 2F)
     animateWhiteRecord(from = 0f, to = maxStopSquareRadius, dur = 200L)
   }
 
   fun stopRecording() {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
     animateBorderCollapse(from = width / 2F, to = 0F)
-    animateBigRedRecord(from = height / 2F, to = maxInnerRedRadius)
+    animateBigRedRecord(from = h / 2F, to = maxInnerRedRadius)
     animateWhiteRecord(from = maxStopSquareRadius, to = 0F, dur = 0L)
   }
 
@@ -161,25 +165,27 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   }
 
   private fun animateBorderCollapse(from: Float, to: Float) {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    val top = (height - h) / 2F
     val w = width
-    val h = height
     val qh = h / 5F
     animateFloat(from, to) {
       val frac = it / (w / 2F) * qh
-      border.set(it, frac, w - it, h - frac)
+      border.set(it, frac + top, w - it, h - frac + top)
       invalidate()
     }.start()
   }
 
   private fun animateWhiteRecord(from: Float, to: Float, dur: Long) {
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    val top = (height - h) / 2F
     val w = width
     val hw = w / 2F
-    val h = height
     val hh = h / 2F
 
     stopSquarePaint.color = Color.WHITE
     animateFloat(from, to) {
-      stopSquare.set(hw - it, hh - it, hw + it, hh + it)
+      stopSquare.set(hw - it, hh - it + top, hw + it, hh + it + top)
       val f = it / maxStopSquareRadius
       stopSquareRadius = (1.1F - f) * roundCorners
       invalidate()

@@ -21,9 +21,7 @@ import common.graphics.circle
 import org.jetbrains.anko.dip
 
 class ShootButton(ctx: Context) : View(ctx), SpringListener {
-  val redSpring = SPRING_SYSTEM.createSpring().apply {
-    springConfig = SpringConfig(500.0, 12.0)
-  }
+  val redSpring = SPRING_SYSTEM.createSpring().apply { springConfig = SpringConfig(500.0, 12.0) }
 
   val border = RectF()
   val outerBlue = RectF()

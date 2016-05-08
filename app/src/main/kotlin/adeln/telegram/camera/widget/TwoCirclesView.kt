@@ -11,6 +11,9 @@ import common.animation.animateFloat
 import common.animation.playSequentially
 import common.context.color
 import org.jetbrains.anko.dip
+import timber.log.Timber
+
+enum class LeftRight { left, right }
 
 // TODO less animation update allocation
 class TwoCirclesView(ctx: Context) : View(ctx) {
@@ -26,6 +29,7 @@ class TwoCirclesView(ctx: Context) : View(ctx) {
       field = value
       invalidate()
     }
+  var leftRight = LeftRight.left
 
   fun moveRight() {
     val w = width.toFloat()
@@ -60,14 +64,22 @@ class TwoCirclesView(ctx: Context) : View(ctx) {
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     val d = circleRadius * 2F
+
+    leftSplit.set(0F, 0F, d, d)
     rightSplit.set(w - d, 0F, w.toFloat(), d)
+
+    Timber.d("size changed with $leftRight")
+
+    activePos = when (leftRight) {
+      LeftRight.left  -> circleRadius
+      LeftRight.right -> w - circleRadius
+    }
   }
 
   override fun onDraw(canvas: Canvas) {
     val radius = circleRadius
-    val pp = passivePaint
-    canvas.drawRoundRect(leftSplit, radius, radius, pp)
-    canvas.drawRoundRect(rightSplit, radius, radius, pp)
+    canvas.drawRoundRect(leftSplit, radius, radius, passivePaint)
+    canvas.drawRoundRect(rightSplit, radius, radius, passivePaint)
     canvas.drawCircle(activePos, radius, radius, activePaint)
   }
 }

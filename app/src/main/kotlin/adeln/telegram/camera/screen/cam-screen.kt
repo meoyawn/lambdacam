@@ -35,6 +35,7 @@ import adeln.telegram.camera.shootButton
 import adeln.telegram.camera.switchView
 import adeln.telegram.camera.widget.FacingView
 import adeln.telegram.camera.widget.FlashView
+import adeln.telegram.camera.widget.LeftRight
 import adeln.telegram.camera.widget.ShootButton
 import adeln.telegram.camera.widget.TwoCirclesView
 import android.hardware.Camera
@@ -49,6 +50,7 @@ import common.context.color
 import common.trycatch.tryTimber
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.dip
@@ -65,7 +67,7 @@ fun _FrameLayout.addCamButtons(panelSize: Int, cam: FacingCamera?) {
     lparams {
       width = touchableSize
       height = dip(32 * (1.5F * 2 + 1))
-      gravity = Gravity.RIGHT
+      gravity = Gravity.END
 
       horizontalMargin = dip(8)
     }
@@ -153,8 +155,22 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
         f.shootView().toVideo()
         setCameraParams(f, Mode.VIDEO)
       }
-      it == Gesture.LONG_TAP                           -> startRecording(Flow.get(ctx), f)
+      it == Gesture.LONG_TAP                           -> {
+        if (mode == Mode.PICTURE) {
+          f.twoCircles().moveRight()
+        }
+        setCameraParams(f, Mode.VIDEO)
+        startRecording(Flow.get(ctx), f)
+      }
     }
+  }
+
+  if (mode == Mode.VIDEO) {
+    f.twoCircles().leftRight = LeftRight.right
+    f.panel().backgroundColor = transparent
+  } else {
+    f.twoCircles().leftRight = LeftRight.left
+    f.panel().backgroundColor = dark
   }
 
   val fv = f.flashView()

@@ -6,16 +6,16 @@ import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Constants
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.MAIN_THREAD
-import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
 import adeln.telegram.camera.cameraTexture
+import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.media.decodeRotateCut
-import adeln.telegram.camera.media.telegramDir
-import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
+import adeln.telegram.camera.media.telegramDir
+import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.push
 import android.graphics.Bitmap
 import android.graphics.Point
@@ -150,16 +150,24 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
   }
 
   vg.cropButton().onClick {
-    Flow.get(vg.context).push(CropScreen(bitmap!!))
+    bitmap?.let {
+      Flow.get(vg.context).push(CropScreen(it))
+    }
   }
 
+  var writing = false
   vg.done().onClick {
+    if (writing) return@onClick
+    val b = bitmap ?: return@onClick
+
+    writing = true
+
     BACKGROUND_THREAD.execute {
       benchmark("write") {
         val f = File(telegramDir(), "${System.currentTimeMillis()}.jpg")
 
         BufferedOutputStream(FileOutputStream(f)).use {
-          bitmap?.compress(Bitmap.CompressFormat.JPEG, 90, it)
+          b.compress(Bitmap.CompressFormat.JPEG, 90, it)
         }
 
         notifyGallery(f)

@@ -9,7 +9,7 @@ import java.io.File
 
 interface Screen
 
-enum class FileAction {  RETAIN, DELETE }
+enum class FileAction { RETAIN, DELETE }
 
 class CamScreen(
     val action: FileAction
@@ -44,8 +44,4 @@ fun VideoRecording.stopRecorder() {
   MAIN_THREAD.removeCallbacks(updater)
   recorder.stopRecorder()
   camera.reconnect()
-}
-
-fun PlayerScreen.release() {
-  player.release()
 }

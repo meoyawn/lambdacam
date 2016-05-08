@@ -1,8 +1,8 @@
 package adeln.telegram.camera.widget
 
 import adeln.telegram.camera.Interpolators
-import adeln.telegram.camera.sharpPaint
 import adeln.telegram.camera.R
+import adeln.telegram.camera.sharpPaint
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.BitmapFactory

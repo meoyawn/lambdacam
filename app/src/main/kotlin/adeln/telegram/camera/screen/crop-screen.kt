@@ -241,7 +241,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 fun formatAngle(angle: Float): String =
     "${DEGREE_FORMAT.format(angle % 360F)}\u00B0"
 
-fun fromCropScreen(vg: _FrameLayout, b:Bitmap) {
+fun fromCropScreen(vg: _FrameLayout, b: Bitmap) {
   val i = Interpolators.decelerate
 
   val panel = vg.panel()

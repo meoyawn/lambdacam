@@ -8,16 +8,15 @@ import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.FileAction
 import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.MAIN_THREAD
-import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
-import adeln.telegram.camera.media.preparePlayer
-import adeln.telegram.camera.navBarSizeIfPresent
+import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
+import adeln.telegram.camera.media.preparePlayer
+import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
-import adeln.telegram.camera.release
 import adeln.telegram.camera.replace
 import adeln.telegram.camera.resetTo
 import adeln.telegram.camera.stopRecorder
@@ -247,7 +246,7 @@ fun _FrameLayout.removePlayer() {
 
 fun CameraActivity.fromPlayer(vg: _FrameLayout, ps: PlayerScreen, panelSize: Int, to: CamScreen) {
   BACKGROUND_THREAD.execute {
-    ps.release()
+    ps.player.release()
     if (to.action == FileAction.DELETE) {
       ps.file.delete()
     }

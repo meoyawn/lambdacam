@@ -3,6 +3,7 @@ package adeln.telegram.camera.screen
 import adeln.telegram.camera.CAMERA_THREAD
 import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
+import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Gesture
 import adeln.telegram.camera.MAIN_THREAD
@@ -38,6 +39,7 @@ import adeln.telegram.camera.widget.ShootButton
 import adeln.telegram.camera.widget.TwoCirclesView
 import android.hardware.Camera
 import android.view.Gravity
+import android.view.View
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import common.android.execute
@@ -121,6 +123,15 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     is TakenScreen    -> fromPicTaken(f, panelSize)
     is VideoRecording -> deleteRecording(f, from)
     is PlayerScreen   -> fromPlayer(f, from, panelSize, to)
+    is CropScreen     -> {
+      f.cameraTexture().visibility = View.VISIBLE
+      window.setBackgroundDrawable(null)
+      f.removeCrop()
+      f.removeView(f.cropView())
+      f.addCamButtons(panelSize, cam)
+      f.panel().translationY = 0F
+      cam?.camera?.startPreview()
+    }
     else              -> f.addCamButtons(panelSize, cam)
   }
 

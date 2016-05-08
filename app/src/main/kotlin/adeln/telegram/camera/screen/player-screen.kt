@@ -192,7 +192,7 @@ fun toPlayer(vg: _FrameLayout, ps: PlayerScreen) {
   vg.playerTexture().surfaceTextureListener = surfaceListener(player, upd, playPause)
 
   vg.cancel().onClick {
-    Flow.get(vg.context).goBack()
+    Flow.get(vg.context).resetTo(CamScreen(FileAction.DELETE))
   }
 
   vg.done().onClick {

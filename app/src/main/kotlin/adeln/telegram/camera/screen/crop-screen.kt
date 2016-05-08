@@ -1,16 +1,23 @@
 package adeln.telegram.camera.screen
 
+import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Constants
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.DEGREE_FORMAT
+import adeln.telegram.camera.FileAction
 import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
 import adeln.telegram.camera.cropOverlayView
+import adeln.telegram.camera.media.MimeTypes
+import adeln.telegram.camera.media.notifyGallery
+import adeln.telegram.camera.media.open
+import adeln.telegram.camera.media.telegramDir
 import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
+import adeln.telegram.camera.resetTo
 import adeln.telegram.camera.stylePanelText
 import adeln.telegram.camera.wheelView
 import adeln.telegram.camera.widget.CropOverlayView
@@ -20,11 +27,13 @@ import android.graphics.Color
 import android.graphics.Point
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.net.Uri
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.yalantis.ucrop.callback.BitmapCropCallback
 import common.animation.animationEnd
 import common.context.color
 import flow.Flow
@@ -43,6 +52,7 @@ import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
 import org.jetbrains.anko.wrapContent
 import timber.log.Timber
+import java.io.File
 
 fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int) {
   val civ = cropView()
@@ -233,8 +243,27 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
     vg.cropOverlay().reset()
   }
 
+  var cropping = false
   vg.doneText().onClick {
-    // TODO done
+    if (cropping) return@onClick
+
+    cropping = true
+    val f = File(telegramDir(), "${System.currentTimeMillis()}.jpg")
+    vg.cropView().cropAndSaveImage(
+        Constants.COMPRESSION_FORMAT,
+        Constants.COMPRESSION_QUALITY,
+        Uri.fromFile(f),
+        object : BitmapCropCallback {
+          override fun onBitmapCropped() {
+            notifyGallery(f)
+            open(f, MimeTypes.JPEG)
+            Flow.get(ctx).resetTo(CamScreen(FileAction.DELETE))
+          }
+
+          override fun onCropFailure(bitmapCropException: Exception): Unit =
+              Timber.e(bitmapCropException, "")
+        }
+    )
   }
 }
 

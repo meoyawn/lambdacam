@@ -6,7 +6,6 @@ import adeln.telegram.camera.media.Flash
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.State
 import android.app.Activity
-import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -18,7 +17,7 @@ class CameraActivity : Activity() {
   val cancelDoneJump = SPRING_SYSTEM.createSpring().apply { springConfig = SpringConfig(500.0, 12.0) }
 
   var facing = Facing.BACK
-  var flash:Flash? = null
+  var flash: Flash? = null
 
   @Volatile var mode = Mode.PICTURE
   @Volatile var camState = State.CLOSED
@@ -34,7 +33,7 @@ class CameraActivity : Activity() {
     val panelSize = size.y - size.x * Constants.PIC_RATIO
 
     val frame = layout(panelSize.toInt())
-    flowDelegate = mkFlow(ParcelableParceler, History.single(CamScreen), savedInstanceState) { t, c ->
+    flowDelegate = mkFlow(ParcelableParceler, History.single(CamScreen(FileAction.DELETE)), savedInstanceState) { t, c ->
       dispatch(frame, t, c, size)
     }
 

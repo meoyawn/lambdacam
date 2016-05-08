@@ -23,7 +23,7 @@ fun CameraActivity.dispatch(vg: _FrameLayout, t: Flow.Traversal, tcb: Flow.Trave
   val from = t.origin.top<Screen>()
   val to = t.destination.top<Screen>()
   when (to) {
-    is CamScreen      -> toCamScreen(from, panelSize, vg)
+    is CamScreen      -> toCamScreen(from, panelSize, vg, to)
     is TakenScreen    -> toPicTaken(panelSize, to, vg, from, size)
     is CropScreen     -> toCropScreen(size, to, vg, from)
     is VideoRecording -> toRecording(vg, to)

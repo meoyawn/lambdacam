@@ -6,26 +6,26 @@ import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Constants
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.MAIN_THREAD
+import adeln.telegram.camera.MimeTypes
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
 import adeln.telegram.camera.TakenScreen
 import adeln.telegram.camera.cameraTexture
-import adeln.telegram.camera.media.Facing
-import adeln.telegram.camera.media.id
+import adeln.telegram.camera.media.decodeRotateCut
+import adeln.telegram.camera.media.telegramDir
 import adeln.telegram.camera.navBarSizeIfPresent
+import adeln.telegram.camera.notifyGallery
+import adeln.telegram.camera.open
 import adeln.telegram.camera.push
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.graphics.Point
-import android.graphics.RectF
-import android.hardware.Camera
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import com.yalantis.ucrop.view.CropImageView
+import common.android.execute
 import common.animation.animationEnd
-import common.trycatch.tryTimber
+import common.benchmark.benchmark
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
 import org.jetbrains.anko.backgroundResource
@@ -36,6 +36,9 @@ import org.jetbrains.anko.horizontalMargin
 import org.jetbrains.anko.imageView
 import org.jetbrains.anko.onClick
 import timber.log.Timber
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 fun _FrameLayout.addPicTaken(panelSize: Int): Unit {
   val hugeButton = dip(52)
@@ -124,18 +127,10 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
 
   when (from) {
     is CamScreen  -> fromCamScreen(vg)
-    is CropScreen -> fromCropScreen(vg)
+    is CropScreen -> fromCropScreen(vg, from.bitmap)
   }
 
   var bitmap: Bitmap? = if (from is CropScreen) from.bitmap else null
-
-  bitmap?.let { b ->
-    vg.cropView().postRotate(-vg.cropView().currentAngle)
-    vg.cropView().setCropRect(RectF(0F, 0F, b.width.toFloat(), b.height.toFloat()))
-    vg.cropView().zoomOutImage(1F)
-    vg.cropView().setImageToWrapCropBounds(true)
-  }
-
   if (bitmap == null) {
     BACKGROUND_THREAD.execute {
       val b = decodeRotateCut(facing, to.bytes)
@@ -159,49 +154,23 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
   }
 
   vg.done().onClick {
-    // TODO done
-  }
-}
+    BACKGROUND_THREAD.execute {
+      benchmark("write") {
+        val f = File(telegramDir(), "${System.currentTimeMillis()}.jpg")
 
-private val TEMP_STORAGE = ByteArray(16 * 1024)
-private val REUSE_POOL = mutableSetOf<Bitmap>()
+        BufferedOutputStream(FileOutputStream(f)).use {
+          bitmap?.compress(Bitmap.CompressFormat.JPEG, 90, it)
+        }
 
-fun decodeReuse(bytes: ByteArray): Bitmap {
-  val opts = BitmapFactory.Options().apply {
-    inSampleSize = 1
-    inPreferredConfig = Bitmap.Config.RGB_565
-    inMutable = true
-    inTempStorage = TEMP_STORAGE
-  }
+        notifyGallery(f)
+        open(f, MimeTypes.JPEG)
+      }
 
-  check(REUSE_POOL.size <= 2)
-
-  return REUSE_POOL.firstOrNull {
-    opts.inBitmap = it
-    tryTimber { decode(bytes, opts) } != null
-  } ?: decode(bytes, opts).apply { REUSE_POOL.add(this) }
-}
-
-fun decode(bytes: ByteArray, opts: BitmapFactory.Options): Bitmap =
-    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
-
-fun decodeRotateCut(facing: Facing, bytes: ByteArray): Bitmap {
-  val info = Camera.CameraInfo()
-  Camera.getCameraInfo(facing.id(), info)
-
-  val orig = decodeReuse(bytes)
-  val cutX = (orig.height * Constants.PIC_RATIO).toInt()
-
-  val rotate = Matrix().apply {
-    postRotate(info.orientation.toFloat())
-    if (facing == Facing.FRONT) {
-      postScale(-1F, 1F)
+      MAIN_THREAD.execute {
+        Flow.get(ctx).goBack()
+      }
     }
   }
-
-  val x = if (facing == Facing.FRONT) Math.abs(orig.width - cutX) else 0
-  // TODO reuse bitmaps
-  return Bitmap.createBitmap(orig, x, 0, cutX, orig.height, rotate, false)
 }
 
 fun CameraActivity.fromPicTaken(f: _FrameLayout, panelSize: Int) {

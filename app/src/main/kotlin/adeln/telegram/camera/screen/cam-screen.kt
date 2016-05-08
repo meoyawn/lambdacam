@@ -1,6 +1,7 @@
 package adeln.telegram.camera.screen
 
 import adeln.telegram.camera.CAMERA_THREAD
+import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Gesture
@@ -115,11 +116,11 @@ fun _FrameLayout.removeCamButtons() {
   removeView(shootView())
 }
 
-fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout) {
+fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to: CamScreen) {
   when (from) {
     is TakenScreen    -> fromPicTaken(f, panelSize)
     is VideoRecording -> deleteRecording(f, from)
-    is PlayerScreen   -> fromPlayer(f, from, panelSize)
+    is PlayerScreen   -> fromPlayer(f, from, panelSize, to)
     else              -> f.addCamButtons(panelSize, cam)
   }
 

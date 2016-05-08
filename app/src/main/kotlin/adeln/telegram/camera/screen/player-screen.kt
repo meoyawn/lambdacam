@@ -2,24 +2,27 @@ package adeln.telegram.camera.screen
 
 import adeln.telegram.camera.BACKGROUND_THREAD
 import adeln.telegram.camera.CAMERA_THREAD
+import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Dimens
+import adeln.telegram.camera.FileAction
 import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.MAIN_THREAD
+import adeln.telegram.camera.MimeTypes
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
-import adeln.telegram.camera.delete
 import adeln.telegram.camera.media.preparePlayer
 import adeln.telegram.camera.navBarSizeIfPresent
+import adeln.telegram.camera.notifyGallery
+import adeln.telegram.camera.open
 import adeln.telegram.camera.panel
+import adeln.telegram.camera.release
 import adeln.telegram.camera.replace
+import adeln.telegram.camera.resetTo
 import adeln.telegram.camera.stopRecorder
-import android.app.Activity
-import android.content.Intent
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
-import android.net.Uri
 import android.view.Gravity
 import android.view.Surface
 import android.view.TextureView
@@ -33,7 +36,6 @@ import common.benchmark.benchmark
 import common.context.dipF
 import common.context.drawable
 import common.trycatch.tryOptional
-import common.trycatch.tryTimber
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
 import org.jetbrains.anko.backgroundResource
@@ -193,16 +195,11 @@ fun toPlayer(vg: _FrameLayout, ps: PlayerScreen) {
   vg.cancel().onClick {
     Flow.get(vg.context).goBack()
   }
-  vg.done().onClick {
-    val i = Intent(Intent.ACTION_VIEW)
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        .setDataAndType(Uri.fromFile(ps.file), "video/mp4")
 
-    val a = vg.context as Activity
-    tryTimber {
-      a.startActivity(i)
-    }
-    a.finish()
+  vg.done().onClick {
+    vg.context.notifyGallery(ps.file)
+    vg.context.open(ps.file, MimeTypes.MPEG4)
+    Flow.get(vg.context).resetTo(CamScreen(FileAction.RETAIN))
   }
 }
 
@@ -248,8 +245,13 @@ fun _FrameLayout.removePlayer() {
   removeCancelDone()
 }
 
-fun CameraActivity.fromPlayer(vg: _FrameLayout, ps: PlayerScreen, panelSize: Int) {
-  BACKGROUND_THREAD.execute { ps.delete() }
+fun CameraActivity.fromPlayer(vg: _FrameLayout, ps: PlayerScreen, panelSize: Int, to: CamScreen) {
+  BACKGROUND_THREAD.execute {
+    ps.release()
+    if (to.action == FileAction.DELETE) {
+      ps.file.delete()
+    }
+  }
 
   vg.addCamButtons(panelSize, cam)
 

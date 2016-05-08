@@ -31,11 +31,12 @@ fun vmPolicy(): StrictMode.VmPolicy =
         .penaltyLog()
         .build()
 
-inline fun Handler.execute(crossinline f: () -> Unit): Unit =
-    when (looper) {
-      Looper.myLooper() -> f()
-      else              -> post { f() }.let { Unit }
-    }
+inline fun Handler.execute(crossinline f: () -> Unit) {
+  when (looper) {
+    Looper.myLooper() -> f()
+    else              -> post { f() }
+  }
+}
 
 inline fun <reified T : Parcelable> creator(crossinline f: (Parcel) -> T) =
     object : Parcelable.Creator<T> {

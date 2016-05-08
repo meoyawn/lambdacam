@@ -9,7 +9,11 @@ import java.io.File
 
 interface Screen
 
-object CamScreen : Screen
+enum class FileAction {  RETAIN, DELETE }
+
+class CamScreen(
+    val action: FileAction
+) : Screen
 
 class TakenScreen(
     val bytes: ByteArray
@@ -44,9 +48,4 @@ fun VideoRecording.stopRecorder() {
 
 fun PlayerScreen.release() {
   player.release()
-}
-
-fun PlayerScreen.delete() {
-  release()
-  file.delete()
 }

@@ -2,7 +2,7 @@ package adeln.telegram.camera
 
 import android.app.Application
 import android.os.StrictMode
-import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.core.CrashlyticsCore
 import com.squareup.leakcanary.LeakCanary
 import common.android.threadPolicy
 import common.android.vmPolicy
@@ -18,6 +18,6 @@ class App : Application() {
       Timber.plant(Timber.DebugTree())
       LeakCanary.install(this)
     }
-    Fabric.with(this, Crashlytics())
+    Fabric.with(this, CrashlyticsCore())
   }
 }

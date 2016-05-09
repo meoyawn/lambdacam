@@ -102,12 +102,14 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   }
 
   fun toVideo() {
+    mode = Mode.VIDEO
     val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(0F, to = off)
     animateSmallRedRecord(from = 0f, to = maxInnerRedRadius, delay = 200L)
   }
 
   fun toPicture() {
+    mode = Mode.PICTURE
     val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(from = off, to = 0F)
     animateSmallRedRecord(from = maxInnerRedRadius, to = 0f, delay = 0L)

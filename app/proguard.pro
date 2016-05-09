@@ -8,12 +8,11 @@
     <fields>;
 }
 
--dontwarn com.yalantis.ucrop.**
--dontwarn android.support.v4.**
-
 -keep class com.crashlytics.** { *; }
 -keepattributes SourceFile, LineNumberTable, *Annotation*
 
 -assumenosideeffects class timber.log.Timber {
     <methods>;
 }
+-dontwarn com.yalantis.ucrop.**
+-dontwarn android.support.v4.**

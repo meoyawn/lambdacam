@@ -11,6 +11,7 @@ import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.Screen
+import adeln.telegram.camera.StartRecording
 import adeln.telegram.camera.StopRecording
 import adeln.telegram.camera.TakenScreen
 import adeln.telegram.camera.VideoRecording
@@ -124,7 +125,8 @@ fun _FrameLayout.removeCamButtons() {
 fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to: CamScreen) {
   when (from) {
     is TakenScreen    -> fromPicTaken(f, panelSize)
-    is VideoRecording -> deleteRecording(f, from, to)
+    is StartRecording -> deleteRecording(f, from)
+    is VideoRecording -> deleteRecording(f, from)
     is PlayerScreen   -> fromPlayer(f, from, panelSize, to)
     is CropScreen     -> {
       f.cameraTexture().visibility = View.VISIBLE
@@ -161,7 +163,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
           f.twoCircles().moveRight()
         }
         setCameraParams(f, Mode.VIDEO)
-        startRecording(Flow.get(ctx), f)
+        Flow.get(ctx).push(StartRecording(null))
       }
     }
   }
@@ -222,8 +224,10 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       Mode.VIDEO   -> {
         val flow = Flow.get(ctx)
         val top = flow.history.top<Screen>()
-        if (top is VideoRecording) flow.replace(StopRecording(top))
-        else startRecording(flow, f)
+        when (top) {
+          is CamScreen      -> flow.push(StartRecording(null))
+          is VideoRecording -> flow.replace(StopRecording(top))
+        }
       }
       Mode.PICTURE -> {
         val raw: Camera.PictureCallback? = null

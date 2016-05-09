@@ -11,6 +11,5 @@
 -dontwarn com.yalantis.ucrop.**
 -dontwarn android.support.v4.**
 
--keepattributes *Annotation*
--keepattributes SourceFile,LineNumberTable
--keep class com.crashlytics.android.core.** { *; }
+-keep class com.crashlytics.** { *; }
+-keepattributes SourceFile, LineNumberTable, *Annotation*

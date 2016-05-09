@@ -5,6 +5,7 @@ import adeln.telegram.camera.media.close
 import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.supportedFlashes
 import adeln.telegram.camera.screen.flashView
+import adeln.telegram.camera.screen.startRecording
 import adeln.telegram.camera.screen.stopRecording
 import adeln.telegram.camera.screen.toCamScreen
 import adeln.telegram.camera.screen.toCropScreen
@@ -29,6 +30,7 @@ fun CameraActivity.dispatch(vg: _FrameLayout, t: Flow.Traversal, tcb: Flow.Trave
     is CamScreen      -> toCamScreen(from, panelSize, vg, to)
     is TakenScreen    -> toPicTaken(panelSize, to, vg, from, size)
     is CropScreen     -> toCropScreen(size, to, vg, from)
+    is StartRecording -> startRecording(vg, to)
     is VideoRecording -> toRecording(vg, to)
     is StopRecording  -> stopRecording(vg, to)
     is PlayerScreen   -> toPlayer(vg, to)
@@ -63,8 +65,9 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
       override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
         val flow = Flow.get(ctx)
         val top = flow.history.top<Screen>()
-        if (top is VideoRecording) {
-          flow.replace(StopRecording(top))
+        when (top) {
+          is StartRecording -> flow.goBack()
+          is VideoRecording -> flow.replace(StopRecording(top))
         }
 
         window.setBackgroundDrawableResource(android.R.color.black)

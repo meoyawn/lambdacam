@@ -24,6 +24,10 @@ private val preferredQualities: List<Int> =
 fun profile(id: Int): CamcorderProfile =
     CamcorderProfile.get(id, preferredQualities.last { CamcorderProfile.hasProfile(id, it) })
 
+inline fun Camera.applyParams(f: Camera.Parameters.() -> Unit): Unit {
+  parameters = parameters.apply(f)
+}
+
 @WorkerThread
 inline fun Context.startRecorder(fc: FacingCamera,
                                  crossinline renderTime: (Long) -> Unit): VideoRecording {
@@ -36,7 +40,11 @@ inline fun Context.startRecorder(fc: FacingCamera,
     camera.stopPreview()
   }
 
-  camera.parameters = camera.parameters.apply { setRecordingHint(true) }
+  camera.applyParams {
+    setRecordingHint(true)
+    focusMode = Mode.VIDEO.focus(supportedFocusModes)
+  }
+
   camera.unlock()
 
   val rec = MediaRecorder().apply {

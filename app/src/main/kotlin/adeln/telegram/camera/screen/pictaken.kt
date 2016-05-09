@@ -41,7 +41,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 fun _FrameLayout.addPicTaken(panelSize: Int): Unit {
-  val hugeButton = dip(52)
+  val circleSize = dip(52)
   val navBarSize = context.navBarSizeIfPresent()
 
   addCancelDone(panelSize)
@@ -49,13 +49,13 @@ fun _FrameLayout.addPicTaken(panelSize: Int): Unit {
   imageView(R.drawable.crop) {
     id = R.id.crop_button
     lparams {
-      width = hugeButton
-      height = hugeButton
+      width = circleSize
+      height = circleSize
       gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-      bottomMargin = (panelSize - navBarSize - hugeButton) / 2 + navBarSize
+      bottomMargin = (panelSize - navBarSize - circleSize) / 2 + navBarSize
     }
 
-    scaleType = ImageView.ScaleType.FIT_CENTER
+    scaleType = ImageView.ScaleType.CENTER_INSIDE
     backgroundResource = R.drawable.clickable_bg
   }
 }

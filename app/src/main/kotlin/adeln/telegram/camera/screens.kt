@@ -1,6 +1,5 @@
 package adeln.telegram.camera
 
-import adeln.telegram.camera.media.stopRecorder
 import android.graphics.Bitmap
 import android.hardware.Camera
 import android.media.MediaPlayer
@@ -11,7 +10,7 @@ interface Screen
 
 enum class FileAction { RETAIN, DELETE }
 
-class CamScreen(
+data class CamScreen(
     val action: FileAction
 ) : Screen
 
@@ -21,6 +20,10 @@ class TakenScreen(
 
 class CropScreen(
     val bitmap: Bitmap
+) : Screen
+
+class StartRecording(
+    var recording: VideoRecording?
 ) : Screen
 
 class VideoRecording(

@@ -1,25 +1,24 @@
 package adeln.telegram.camera.screen
 
-import adeln.telegram.camera.BACKGROUND_THREAD
 import adeln.telegram.camera.CAMERA_THREAD
-import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.R
+import adeln.telegram.camera.Screen
+import adeln.telegram.camera.StartRecording
 import adeln.telegram.camera.VideoRecording
 import adeln.telegram.camera.cameraTexture
-import adeln.telegram.camera.media.Mode
-import adeln.telegram.camera.media.focus
 import adeln.telegram.camera.media.startRecorder
 import adeln.telegram.camera.media.stopRecorder
 import adeln.telegram.camera.panel
-import adeln.telegram.camera.push
+import adeln.telegram.camera.replace
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
+import common.android.assertMainThread
 import common.android.execute
 import common.animation.animationEnd
 import common.benchmark.benchmark
@@ -43,7 +42,7 @@ fun leadingZero(num: Long): String =
 fun minsSecs(time: Long): String =
     "${leadingZero(time / 60000)}:${leadingZero((time / 1000 % 100))}"
 
-fun CameraActivity.startRecording(flow: Flow, vg: _FrameLayout): Unit {
+fun CameraActivity.startRecording(vg: _FrameLayout, to: StartRecording): Unit {
   val dur = vg.run {
     textView(minsSecs(0L)) {
       id = R.id.record_duration
@@ -62,21 +61,23 @@ fun CameraActivity.startRecording(flow: Flow, vg: _FrameLayout): Unit {
   }
 
   CAMERA_THREAD.execute {
-    if (mode == Mode.PICTURE) {
-      cam?.camera?.parameters = cam?.camera?.parameters?.apply {
-        focusMode = Mode.VIDEO.focus(supportedFocusModes)
-      }
-    }
     val rec = benchmark("start record") {
       cam?.let {
         startRecorder(it) {
+          assertMainThread()
           dur.text = minsSecs(it)
         }
       }
     }
 
+    to.recording = rec
+
     MAIN_THREAD.execute {
-      flow.push(rec)
+      val flow = Flow.get(vg)
+      val top = flow.history.top<Screen>()
+      if (top is StartRecording) {
+        flow.replace(rec)
+      }
     }
   }
 
@@ -112,23 +113,25 @@ fun _FrameLayout.removeRecording() {
   removeView(recordDuration())
 }
 
-fun CameraActivity.deleteRecording(f: _FrameLayout, from: VideoRecording, to: CamScreen) {
+fun deleteRecording(f: _FrameLayout, from: VideoRecording) {
   CAMERA_THREAD.execute {
-    benchmark("stop recorder") {
-      from.stopRecorder()
-    }
-
-    if (mode == Mode.PICTURE) {
-      cam?.camera?.parameters = cam?.camera?.parameters?.apply {
-        focusMode = Mode.PICTURE.focus(supportedFocusModes)
-      }
-    }
-
-    BACKGROUND_THREAD.execute { from.file.delete() }
+    stopDelete(from)
   }
 
+  recToCam(f)
+}
+
+fun deleteRecording(f: _FrameLayout, from: StartRecording) {
+  CAMERA_THREAD.execute {
+    from.recording?.let { stopDelete(it) }
+  }
+
+  recToCam(f)
+}
+
+fun recToCam(f: _FrameLayout) {
   f.recordDuration().animate()
-      .translationY(dipF(Dimens.RECORD_DURATION_HIDE()))
+      .translationY(f.dipF(Dimens.RECORD_DURATION_HIDE()))
       .setInterpolator(Interpolators.decelerate)
       .animationEnd {
         f.removeRecording()
@@ -148,4 +151,11 @@ fun CameraActivity.deleteRecording(f: _FrameLayout, from: VideoRecording, to: Ca
       .alpha(1F)
       .setInterpolator(Interpolators.decelerate)
       .start()
+}
+
+fun stopDelete(rec: VideoRecording) {
+  benchmark("stop recorder") {
+    rec.stopRecorder()
+    rec.file.delete()
+  }
 }

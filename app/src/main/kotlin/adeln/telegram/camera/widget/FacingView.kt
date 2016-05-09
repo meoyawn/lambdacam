@@ -29,6 +29,7 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
 
   var facing: Facing = Facing.BACK
 
+
   fun toFront(): Unit {
     facing = Facing.FRONT
     ValueAnimator.ofFloat(180F, 0F)
@@ -47,7 +48,7 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
         .start()
   }
 
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int): Unit {
     val cx = w / 2F
     val cy = h / 2F
 
@@ -56,8 +57,8 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
     circlePath.reset()
     circlePath.addCircle(cx, cy, circleRadius, Path.Direction.CW)
     val drill = when (facing) {
-      Facing.FRONT -> 0F
-      Facing.BACK  -> maxDrillRadius
+      Facing.BACK  -> 0F
+      Facing.FRONT -> maxDrillRadius
     }
     circlePath.addCircle(cx, cy, drill, Path.Direction.CCW)
   }

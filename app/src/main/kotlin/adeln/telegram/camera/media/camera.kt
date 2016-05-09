@@ -71,7 +71,14 @@ fun open(facing: Facing, mode: Mode, tv: TextureView): FacingCamera =
       ps.config(mode, height, width)
       cam.parameters = ps
 
-      cam.setDisplayOrientation(90)
+      val info = Camera.CameraInfo()
+      Camera.getCameraInfo(facing.id(), info)
+      val orient = when (facing) {
+        Facing.FRONT -> Math.abs(360 - info.orientation) % 360
+        Facing.BACK  -> info.orientation
+      }
+      cam.setDisplayOrientation(orient)
+
       cam.setPreviewTexture(tv.surfaceTexture)
       cam.startPreview()
 

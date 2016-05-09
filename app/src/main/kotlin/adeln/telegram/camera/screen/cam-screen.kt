@@ -176,6 +176,8 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
   f.shootView().mode = mode
 
   val fv = f.flashView()
+
+  f.facingView().facing = facing
   f.facingView().onClick {
     when (facing) {
       Facing.BACK  -> {

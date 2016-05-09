@@ -23,7 +23,6 @@ import adeln.telegram.camera.stylePanelText
 import adeln.telegram.camera.wheelView
 import adeln.telegram.camera.widget.CropOverlayView
 import adeln.telegram.camera.widget.WheelView
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.RectF
@@ -277,7 +276,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 fun formatAngle(angle: Float): String =
     "${DEGREE_FORMAT.format(angle % 360F)}\u00B0"
 
-fun fromCropScreen(vg: _FrameLayout, b: Bitmap) {
+fun fromCropScreen(vg: _FrameLayout) {
   val i = Interpolators.decelerate
 
   val panel = vg.panel()
@@ -327,8 +326,9 @@ fun fromCropScreen(vg: _FrameLayout, b: Bitmap) {
       }
       .start()
 
-  vg.cropView().postRotate(-vg.cropView().currentAngle)
-  vg.cropView().setCropRect(RectF(0F, 0F, b.width.toFloat(), b.height.toFloat()))
-  vg.cropView().zoomOutImage(1F)
-  vg.cropView().setImageToWrapCropBounds(true)
+  val cv = vg.cropView()
+  cv.postRotate(-cv.currentAngle)
+  cv.setCropRect(RectF(0F, 0F, cv.width.toFloat(), cv.height.toFloat()))
+  cv.zoomOutImage(1F)
+  cv.setImageToWrapCropBounds(true)
 }

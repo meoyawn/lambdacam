@@ -213,6 +213,8 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 
   vg.addCropScreen(w, h, size.y)
 
+  vg.degrees().text = formatAngle(0F)
+
   vg.cropButtonPanel().translationY = -where
   vg.cropButtonPanel().animate()
       .translationY(0F)

@@ -19,6 +19,7 @@ import common.android.execute
 import common.animation.animationEnd
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
+import org.jetbrains.anko.ctx
 
 fun CameraActivity.dispatch(vg: _FrameLayout, t: Flow.Traversal, tcb: Flow.TraversalCallback, size: Point) {
   val panelSize = (size.y - size.x * Constants.PIC_RATIO).toInt()
@@ -60,6 +61,12 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
       }
 
       override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+        val flow = Flow.get(ctx)
+        val top = flow.history.top<Screen>()
+        if (top is VideoRecording) {
+          flow.replace(StopRecording(top))
+        }
+
         window.setBackgroundDrawableResource(android.R.color.black)
         camState = State.CLOSING
         CAMERA_THREAD.execute {

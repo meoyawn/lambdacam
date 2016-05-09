@@ -27,7 +27,6 @@ import adeln.telegram.camera.media.close
 import adeln.telegram.camera.media.focus
 import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.supportedFlashes
-import adeln.telegram.camera.media.toString
 import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.push
@@ -38,6 +37,7 @@ import adeln.telegram.camera.widget.FacingView
 import adeln.telegram.camera.widget.FlashView
 import adeln.telegram.camera.widget.ShootButton
 import adeln.telegram.camera.widget.TwoCirclesView
+import adeln.telegram.camera.widget.calc
 import android.hardware.Camera
 import android.view.Gravity
 import android.view.View
@@ -199,8 +199,12 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       val c = open(facing, mode, tv)
       cam = c
 
+      val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
+      val cur = calc(sf, flash)
+      flash = cur?.let { sf[it] }
+
       MAIN_THREAD.execute {
-        flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
+        fv.setFlash(sf, cur)
       }
     }
   }
@@ -230,7 +234,11 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     }
   }
 
-  flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
+  val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
+  val cur = calc(sf, flash)
+  flash = cur?.let { sf[it] }
+
+  fv.setFlash(sf, cur)
   fv.onClick {
     fv.setNext()?.let { flash = it }
   }
@@ -241,15 +249,16 @@ fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {
 
   val params = cam?.camera?.parameters
   val flashes = supportedFlashes(mode, params?.supportedFlashModes)
-  flash = f.flashView().setFlash(flashes, flash)
+
+  val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
+  val cur = calc(sf, flash)
+  f.flashView().setFlash(flashes, cur)
 
   CAMERA_THREAD.execute {
     cam?.camera?.parameters = params?.apply {
       this.focusMode = mode.focus(supportedFocusModes)
-      flashes.firstOrNull()
-          ?.let { toString(it) }
-          ?.let { flashMode = it }
     }
+    flash = cur?.let { sf[it] }
   }
 }
 

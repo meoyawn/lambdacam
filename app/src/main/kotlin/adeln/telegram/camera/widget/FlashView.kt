@@ -13,7 +13,13 @@ import common.android.assertMainThread
 import common.animation.chainInterpolator
 import common.animation.chainUpdateListener
 import common.context.dipF
-import timber.log.Timber
+
+fun calc(fs: List<Flash>, f: Flash?): Int? =
+    when {
+      f in fs         -> fs.indexOf(f)
+      fs.isNotEmpty() -> 0
+      else            -> null
+    }
 
 class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener {
   private val bitmaps = run {
@@ -44,23 +50,15 @@ class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener 
     }
   }
 
-  fun setFlash(fs: List<Flash>, f: Flash?): Flash? {
+  fun setFlash(fs: List<Flash>, cur: Int?) {
     assertMainThread()
-
-    Timber.d("setting a flash")
 
     val before = current?.let { supported[it] }
     supported = fs
-    current = when {
-      f in fs         -> fs.indexOf(f)
-      fs.isNotEmpty() -> 0
-      else            -> null
-    }
+    current = cur
     val after = current?.let { supported[it] }
 
     if (after != before) animateChange()
-
-    return after
   }
 
   fun setNext(): Flash? =

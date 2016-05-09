@@ -11,6 +11,7 @@ import adeln.telegram.camera.screen.toCropScreen
 import adeln.telegram.camera.screen.toPicTaken
 import adeln.telegram.camera.screen.toPlayer
 import adeln.telegram.camera.screen.toRecording
+import adeln.telegram.camera.widget.calc
 import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.view.TextureView
@@ -41,13 +42,19 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
         CAMERA_THREAD.execute {
           val c = open(facing, mode, tv)
           cam = c
+
+          val sf = supportedFlashes(mode, c.camera.parameters.supportedFlashModes)
+          val cur = calc(sf, flash)
+          flash = cur?.let { sf[it] }
+
           MAIN_THREAD.execute {
             val fv = vg.flashView()
             fv.alpha = 0F
             fv.animate()
                 .alpha(1F)
                 .start()
-            flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
+
+            fv.setFlash(sf, cur)
           }
         }
       }

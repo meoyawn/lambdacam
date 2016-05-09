@@ -1,6 +1,7 @@
 package common.android
 
 import adeln.telegram.camera.BuildConfig
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcel
@@ -55,3 +56,9 @@ fun <T : Parcelable> T?.writeOptional(dest: Parcel, flags: Int): Unit =
       dest.writeInt(1)
       it.writeToParcel(dest, flags)
     } ?: dest.writeInt(0)
+
+inline fun <T> whenSdk(level: Int, f: () -> T): T? =
+    when {
+      Build.VERSION.SDK_INT >= level -> f()
+      else                           -> null
+    }

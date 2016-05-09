@@ -7,10 +7,10 @@ import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.State
 import adeln.telegram.camera.media.toString
 import android.app.Activity
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import com.facebook.rebound.SpringConfig
+import common.android.whenSdk
 import flow.FlowDelegate
 import flow.History
 
@@ -49,7 +49,7 @@ class CameraActivity : Activity() {
 
     setContentView(frame)
 
-    if (Build.VERSION.SDK_INT >= 19) {
+    whenSdk(19) {
       window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                       WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
     }

@@ -9,6 +9,7 @@ import android.media.MediaRecorder
 import android.os.SystemClock
 import android.support.annotation.WorkerThread
 import common.android.assertWorkerThread
+import common.android.whenSdk
 import common.trycatch.tryTimber
 import java.io.File
 
@@ -31,7 +32,10 @@ inline fun Context.startRecorder(fc: FacingCamera,
   val file = File(telegramDir(), "${System.currentTimeMillis()}.mp4")
   val (camera, facing) = fc
 
-  camera.stopPreview()
+  whenSdk(23) {
+    camera.stopPreview()
+  }
+
   camera.parameters = camera.parameters.apply { setRecordingHint(true) }
   camera.unlock()
 
@@ -76,5 +80,7 @@ fun VideoRecording.stopRecorder() {
   recorder.stopRecorder()
   camera.reconnect()
   camera.parameters = camera.parameters.apply { setRecordingHint(false) }
-  camera.startPreview()
+  whenSdk(23) {
+    camera.startPreview()
+  }
 }

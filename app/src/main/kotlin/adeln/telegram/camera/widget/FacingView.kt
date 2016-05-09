@@ -9,26 +9,23 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
+import android.graphics.Path
 import android.view.View
 import common.animation.chainInterpolator
 import common.animation.chainUpdateListener
+import common.context.dipF
 import org.jetbrains.anko.dip
 
 class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener {
   private val arrows = BitmapFactory.decodeResource(resources, R.drawable.switch_arrow)
   private val arrowsMatrix = Matrix()
 
-  //  private val arrowsPaint = Paint()
+  private val circlePath = Path().apply { fillType = Path.FillType.WINDING }
   private val circlePaint = sharpPaint(Color.WHITE)
-  // TODO https://medium.com/@rey5137/let-s-drill-a-hole-in-your-view-e7f53fa23376
-  private val drillPaint = sharpPaint(Color.TRANSPARENT).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
   private val duration = 500L
   private val circleRadius = dip(6).toFloat()
-  private val maxDrillRadius = dip(4)
-  private var drillRadius = maxDrillRadius.toFloat()
+  private val maxDrillRadius = dipF(4)
 
   fun toFront(): Unit =
       ValueAnimator.ofFloat(0F, 180F)
@@ -44,27 +41,38 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
           .chainInterpolator(Interpolators.decelerate)
           .start()
 
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    arrowsMatrix.setTranslate((w - arrows.width) / 2F, (h - arrows.height) / 2F)
+
+    val cx = w / 2F
+    val cy = h / 2F
+
+    circlePath.reset()
+    circlePath.addCircle(cx, cy, circleRadius, Path.Direction.CW)
+    circlePath.addCircle(cx, cy, maxDrillRadius, Path.Direction.CCW)
+  }
+
   override fun onAnimationUpdate(animation: ValueAnimator) {
-    val value = animation.animatedValue as Float
+    val deg = animation.animatedValue as Float
     val w = width
     val h = height
 
+    val cx = w / 2F
+    val cy = h / 2F
+
     arrowsMatrix.setTranslate((w - arrows.width) / 2F, (h - arrows.height) / 2F)
-    arrowsMatrix.postRotate(value, w / 2F, h / 2F)
-    drillRadius = Math.abs(value - 180F) / 180F * maxDrillRadius
+    arrowsMatrix.postRotate(deg, w / 2F, h / 2F)
+
+    circlePath.reset()
+    circlePath.addCircle(cx, cy, circleRadius, Path.Direction.CW)
+    val drillRatio = Math.abs(deg - 180F) / 180F
+    circlePath.addCircle(cx, cy, drillRatio * maxDrillRadius, Path.Direction.CCW)
 
     invalidate()
   }
 
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    arrowsMatrix.setTranslate((w - arrows.width) / 2F, (h - arrows.height) / 2F)
-  }
-
   override fun onDraw(canvas: Canvas) {
     canvas.drawBitmap(arrows, arrowsMatrix, null)
-    val cx = width / 2F
-    val cy = height / 2F
-    canvas.drawCircle(cx, cy, circleRadius, circlePaint)
-    canvas.drawCircle(cx, cy, drillRadius, drillPaint)
+    canvas.drawPath(circlePath, circlePaint)
   }
 }

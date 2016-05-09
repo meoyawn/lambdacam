@@ -5,6 +5,7 @@ import adeln.telegram.camera.media.FacingCamera
 import adeln.telegram.camera.media.Flash
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.State
+import adeln.telegram.camera.media.toString
 import android.app.Activity
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,14 @@ class CameraActivity : Activity() {
 
   var facing = Facing.BACK
   var flash: Flash? = null
+    set(value) {
+      field = value
+      value?.let {
+        cam?.camera?.parameters = cam?.camera?.parameters?.apply {
+          flashMode = toString(it)
+        }
+      }
+    }
 
   @Volatile var mode = Mode.PICTURE
   @Volatile var camState = State.CLOSED

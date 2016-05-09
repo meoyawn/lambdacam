@@ -3,6 +3,7 @@ package adeln.telegram.camera
 import adeln.telegram.camera.media.State
 import adeln.telegram.camera.media.close
 import adeln.telegram.camera.media.open
+import adeln.telegram.camera.media.supportedFlashes
 import adeln.telegram.camera.screen.flashView
 import adeln.telegram.camera.screen.stopRecording
 import adeln.telegram.camera.screen.toCamScreen
@@ -38,7 +39,7 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
     object : TextureView.SurfaceTextureListener {
       override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
         CAMERA_THREAD.execute {
-          val c = open(facing, mode, flash, tv)
+          val c = open(facing, mode, tv)
           cam = c
           MAIN_THREAD.execute {
             val fv = vg.flashView()
@@ -46,7 +47,7 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
             fv.animate()
                 .alpha(1F)
                 .start()
-            flash = fv.setFlash(c.flashes, flash)
+            flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
           }
         }
       }

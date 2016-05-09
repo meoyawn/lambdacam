@@ -8,7 +8,6 @@ import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
 import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
 import android.hardware.Camera.Parameters.FOCUS_MODE_EDOF
 import android.hardware.Camera.Parameters.FOCUS_MODE_FIXED
-import android.support.annotation.Size
 import android.view.TextureView
 import common.android.assertWorkerThread
 import common.benchmark.benchmark
@@ -59,7 +58,7 @@ fun supportedFlashes(mode: Mode, flashes: List<String>?): List<Flash> =
       }
     }
 
-fun open(facing: Facing, mode: Mode, flash: Flash?, tv: TextureView): FacingCamera =
+fun open(facing: Facing, mode: Mode, tv: TextureView): FacingCamera =
     benchmark("open") {
       val cam = Camera.open(facing.id())
       assertWorkerThread()
@@ -69,14 +68,14 @@ fun open(facing: Facing, mode: Mode, flash: Flash?, tv: TextureView): FacingCame
       val width = tv.width
 
       val ps = cam.parameters
-      val flashes = ps.config(mode, flash, height, width)
+      ps.config(mode, height, width)
       cam.parameters = ps
 
       cam.setDisplayOrientation(90)
       cam.setPreviewTexture(tv.surfaceTexture)
       cam.startPreview()
 
-      FacingCamera(cam, facing, flashes)
+      FacingCamera(cam, facing)
     }
 
 fun closest(allSupportSizes: List<Camera.Size>, preferW: Int, preferH: Int): Camera.Size {
@@ -125,24 +124,18 @@ fun Mode.focus(focuses: List<String>): String =
 
 data class FacingCamera(
     val camera: Camera,
-    val facing: Facing,
-    @Size(min = 0) val flashes: List<Flash>
+    val facing: Facing
 )
 
-fun Camera.Parameters.config(mode: Mode, flash: Flash?, preferW: Int, preferH: Int): List<Flash> {
+fun Camera.Parameters.config(mode: Mode, preferW: Int, preferH: Int) {
   set("cam_mode", 1) // don't even ask
   focusMode = mode.focus(supportedFocusModes)
-  val supported = supportedFlashes(mode, supportedFlashModes)
-  if (flash in supported) {
-    flashMode = flash?.let { toString(it) }
-  }
 
   val preview = closest(supportedPreviewSizes, preferW, preferH)
   setPreviewSize(preview.width, preview.height)
 
   val picture = closest(supportedPictureSizes, preferW, preferH)
   setPictureSize(picture.width, picture.height)
-  return supported
 }
 
 val SHUTTER = Camera.ShutterCallback {}

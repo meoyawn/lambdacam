@@ -13,9 +13,10 @@ import common.android.assertMainThread
 import common.animation.chainInterpolator
 import common.animation.chainUpdateListener
 import common.context.dipF
+import timber.log.Timber
 
 class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener {
-  val bitmaps = run {
+  private val bitmaps = run {
     val res = resources
     val on = BitmapFactory.decodeResource(res, R.drawable.flash_on)
     mapOf(
@@ -26,13 +27,13 @@ class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener 
     )
   }
 
-  val imgSize = dipF(32)
-  val activePaint = Paint()
-  val inactivePaint = Paint().apply { alpha = 0 }
+  private val imgSize = dipF(32)
+  private val activePaint = Paint()
+  private val inactivePaint = Paint().apply { alpha = 0 }
 
   private var supported: List<Flash> = emptyList()
-  var current: Int? = null
-  var translate = imgSize
+  private var current: Int? = null
+  private var translate = imgSize
 
   override fun onDraw(canvas: Canvas) {
     current?.let {
@@ -45,6 +46,8 @@ class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener 
 
   fun setFlash(fs: List<Flash>, f: Flash?): Flash? {
     assertMainThread()
+
+    Timber.d("setting a flash")
 
     val before = current?.let { supported[it] }
     supported = fs

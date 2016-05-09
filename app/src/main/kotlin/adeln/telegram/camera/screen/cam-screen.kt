@@ -196,11 +196,11 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     CAMERA_THREAD.execute {
       cam?.camera?.close()
       camState = State.CLOSED
-      val c = open(facing, mode, flash, tv)
+      val c = open(facing, mode, tv)
       cam = c
 
       MAIN_THREAD.execute {
-        flash = fv.setFlash(c.flashes, flash)
+        flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
       }
     }
   }
@@ -230,14 +230,9 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     }
   }
 
-  flash = fv.setFlash(cam?.flashes ?: emptyList(), flash)
+  flash = fv.setFlash(supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes), flash)
   fv.onClick {
-    fv.setNext()?.let { f ->
-      val params = cam?.camera?.parameters?.apply { flashMode = toString(f) }
-      cam?.camera?.parameters = params
-
-      flash = f
-    }
+    fv.setNext()?.let { flash = it }
   }
 }
 

@@ -106,9 +106,9 @@ fun stopRecording(vg: _FrameLayout, sr: StopRecording) {
     }
   }
 
-  vg.flashView().animate()
-      .alpha(0F)
-      .start()
+  vg.flashView()?.animate()
+      ?.alpha(0F)
+      ?.start()
   vg.recordDuration().animate()
       .translationY(vg.dipF(Dimens.RECORD_DURATION_HIDE()))
       .setInterpolator(Interpolators.accelerate)

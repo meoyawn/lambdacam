@@ -55,6 +55,7 @@ import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.find
+import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.horizontalMargin
 import org.jetbrains.anko.onClick
 
@@ -108,7 +109,7 @@ fun _FrameLayout.addCamButtons(panelSize: Int, cam: FacingCamera?) {
   }
 }
 
-fun _FrameLayout.flashView(): FlashView = find(R.id.flash)
+fun _FrameLayout.flashView(): FlashView? = findOptional(R.id.flash)
 fun _FrameLayout.shootView(): ShootButton = find(R.id.shoot)
 fun _FrameLayout.facingView(): FacingView = find(R.id.facing)
 fun _FrameLayout.twoCircles(): TwoCirclesView = find(R.id.circles)
@@ -204,7 +205,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       flash = cur?.let { sf[it] }
 
       MAIN_THREAD.execute {
-        fv.setFlash(sf, cur)
+        fv?.setFlash(sf, cur)
       }
     }
   }
@@ -238,9 +239,11 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
   val cur = calc(sf, flash)
   flash = cur?.let { sf[it] }
 
-  fv.setFlash(sf, cur)
-  fv.onClick {
-    fv.setNext()?.let { flash = it }
+  fv?.run {
+    setFlash(sf, cur)
+    onClick {
+      setNext()?.let { flash = it }
+    }
   }
 }
 
@@ -252,7 +255,7 @@ fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {
 
   val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
   val cur = calc(sf, flash)
-  f.flashView().setFlash(flashes, cur)
+  f.flashView()?.setFlash(flashes, cur)
 
   CAMERA_THREAD.execute {
     cam?.camera?.parameters = params?.apply {
@@ -263,9 +266,9 @@ fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {
 }
 
 fun CameraActivity.fromCamScreen(vg: _FrameLayout) {
-  vg.flashView().animate()
-      .alpha(0F)
-      .start()
+  vg.flashView()?.animate()
+      ?.alpha(0F)
+      ?.start()
   vg.twoCircles().animate()
       .alpha(0F)
       .start()

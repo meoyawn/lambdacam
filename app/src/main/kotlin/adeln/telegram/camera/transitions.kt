@@ -48,13 +48,7 @@ fun CameraActivity.listener(vg: _FrameLayout, tv: TextureView) =
           flash = cur?.let { sf[it] }
 
           MAIN_THREAD.execute {
-            val fv = vg.flashView()
-            fv.alpha = 0F
-            fv.animate()
-                .alpha(1F)
-                .start()
-
-            fv.setFlash(sf, cur)
+            vg.flashView()?.setFlash(sf, cur)
           }
         }
       }

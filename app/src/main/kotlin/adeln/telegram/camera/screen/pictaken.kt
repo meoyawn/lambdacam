@@ -204,10 +204,10 @@ fun CameraActivity.fromPicTaken(f: _FrameLayout, panelSize: Int) {
       .alpha(0F)
       .start()
 
-  f.flashView().alpha = 0F
-  f.flashView().animate()
-      .alpha(1F)
-      .start()
+  f.flashView()?.alpha = 0F
+  f.flashView()?.animate()
+      ?.alpha(1F)
+      ?.start()
   f.twoCircles().alpha = 0F
   f.twoCircles().animate()
       .alpha(1F)

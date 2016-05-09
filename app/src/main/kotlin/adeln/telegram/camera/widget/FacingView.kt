@@ -31,7 +31,7 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
 
   fun toFront(): Unit {
     facing = Facing.FRONT
-    ValueAnimator.ofFloat(0F, 180F)
+    ValueAnimator.ofFloat(180F, 0F)
         .chainUpdateListener(this)
         .setDuration(Constants.CAM_SWITCH_ANIM_DUR)
         .chainInterpolator(Interpolators.decelerate)
@@ -40,7 +40,7 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
 
   fun toBack(): Unit {
     facing = Facing.BACK
-    ValueAnimator.ofFloat(180F, 360F)
+    ValueAnimator.ofFloat(360F, 180F)
         .chainUpdateListener(this)
         .setDuration(Constants.CAM_SWITCH_ANIM_DUR)
         .chainInterpolator(Interpolators.decelerate)

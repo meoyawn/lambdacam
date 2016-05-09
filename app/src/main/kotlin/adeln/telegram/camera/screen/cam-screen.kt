@@ -173,6 +173,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     f.twoCircles().leftRight = LeftRight.LEFT
     f.panel().backgroundColor = dark
   }
+  f.shootView().mode = mode
 
   val fv = f.flashView()
   f.facingView().onClick {

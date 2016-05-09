@@ -41,7 +41,7 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
 
   private var innerRedRadius = 0F
   private var stopSquareRadius = roundCorners
-  private var mode = Mode.PICTURE
+  var mode = Mode.PICTURE
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
@@ -53,17 +53,25 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
     super.onDetachedFromWindow()
   }
 
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+  override fun onSizeChanged(w: Int, height: Int, oldw: Int, oldh: Int) {
     val cx = w / 2f
-    val cy = h / 2f
-//    when(mode) {
-//      Mode.PICTURE -> {
-//
-//      }
-//    }
-    border.circle(cx, cy, dip(Dimens.HUGE_BUTTON_HEIGHT()) / 2F)
-    outerBlue.circle(cx, cy, maxOuterBlueRadius)
-    stopSquare.circle(cx, cy, maxInnerBlueRadius)
+    val cy = height / 2f
+    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
+    when (mode) {
+      Mode.PICTURE -> {
+        border.circle(cx, cy, h / 2F)
+        outerBlue.circle(cx, cy, maxOuterBlueRadius)
+        stopSquare.circle(cx, cy, maxInnerBlueRadius)
+      }
+      Mode.VIDEO   -> {
+        val top = (height - h) / 2F
+        stopSquareRadius = roundCorners
+        stopSquarePaint.color = context.color(R.color.inner_blue)
+        border.set(0F, top, w.toFloat(), top + h)
+        stopSquare.set(w / 2f, h / 2f + top, w / 2f, h / 2f + top)
+        innerRedRadius = maxInnerRedRadius
+      }
+    }
   }
 
   override fun onDraw(canvas: Canvas) {
@@ -97,18 +105,6 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
     val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
     animateBlue(0F, to = off)
     animateSmallRedRecord(from = 0f, to = maxInnerRedRadius, delay = 200L)
-  }
-
-  fun setVideo() {
-    val h = dip(Dimens.HUGE_BUTTON_HEIGHT())
-    val w = width
-    val top = (height - h) / 2F
-    val bw = h / 2F - maxOuterBlueRadius
-    val off = (width - dip(Dimens.HUGE_BUTTON_HEIGHT())) / 2F
-    stopSquareRadius = roundCorners
-    stopSquarePaint.color = context.color(R.color.inner_blue)
-    border.set(0F, top, w.toFloat(), top + h)
-    stopSquare.set(w / 2f, h / 2f + top, w / 2f, h / 2f + top)
   }
 
   fun toPicture() {

@@ -27,7 +27,7 @@ class TwoCirclesView(ctx: Context) : View(ctx) {
       field = value
       invalidate()
     }
-  var leftRight = LeftRight.left
+  var leftRight = LeftRight.LEFT
 
   fun moveRight() {
     val w = width.toFloat()
@@ -67,8 +67,8 @@ class TwoCirclesView(ctx: Context) : View(ctx) {
     rightSplit.set(w - d, 0F, w.toFloat(), d)
 
     activePos = when (leftRight) {
-      LeftRight.left  -> circleRadius
-      LeftRight.right -> w - circleRadius
+      LeftRight.LEFT  -> circleRadius
+      LeftRight.RIGHT -> w - circleRadius
     }
   }
 

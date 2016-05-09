@@ -2,7 +2,7 @@ buildscript {
   ext {
     CI = "true".equals(System.env.CI)
 
-    minSdk = 16
+    minSdk = 15
     targetSdk = 23
     buildTools = "23.0.3"
 

@@ -166,10 +166,10 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
   }
 
   if (mode == Mode.VIDEO) {
-    f.twoCircles().leftRight = LeftRight.right
+    f.twoCircles().leftRight = LeftRight.RIGHT
     f.panel().backgroundColor = transparent
   } else {
-    f.twoCircles().leftRight = LeftRight.left
+    f.twoCircles().leftRight = LeftRight.LEFT
     f.panel().backgroundColor = dark
   }
 

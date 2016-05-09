@@ -18,7 +18,8 @@ class CameraActivity : Activity() {
   val cancelDoneJump = SPRING_SYSTEM.createSpring().apply { springConfig = SpringConfig(500.0, 12.0) }
 
   var facing = Facing.BACK
-  var flash: Flash? = null
+
+  @Volatile var flash: Flash? = null
     set(value) {
       field = value
       value?.let {

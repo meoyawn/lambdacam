@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "redex"
+apply plugin: "io.fabric"
 
 android {
   compileSdkVersion targetSdk
@@ -67,6 +68,8 @@ dependencies {
 
   debugCompile "com.squareup.leakcanary:leakcanary-android:$versions.leakCanary"
   releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$versions.leakCanary"
+
+  compile('com.crashlytics.sdk.android:crashlytics:+@aar') { transitive = true; }
 }
 
 configurations {

@@ -160,6 +160,7 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
     if (writing) return@onClick
     val b = bitmap ?: return@onClick
 
+    window.setBackgroundDrawableResource(android.R.color.black)
     writing = true
 
     BACKGROUND_THREAD.execute {

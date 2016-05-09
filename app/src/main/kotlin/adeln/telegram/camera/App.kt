@@ -2,11 +2,12 @@ package adeln.telegram.camera
 
 import android.app.Application
 import android.os.StrictMode
+import com.crashlytics.android.Crashlytics
 import com.squareup.leakcanary.LeakCanary
 import common.android.threadPolicy
 import common.android.vmPolicy
+import io.fabric.sdk.android.Fabric
 import timber.log.Timber
-import java.lang.reflect.Array as Arr
 
 class App : Application() {
   override fun onCreate(): Unit {
@@ -17,5 +18,6 @@ class App : Application() {
       Timber.plant(Timber.DebugTree())
       LeakCanary.install(this)
     }
+    Fabric.with(this, Crashlytics())
   }
 }

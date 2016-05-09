@@ -48,14 +48,13 @@ class FacingView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener
   }
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    arrowsMatrix.setTranslate((w - arrows.width) / 2F, (h - arrows.height) / 2F)
-
     val cx = w / 2F
     val cy = h / 2F
 
+    arrowsMatrix.setTranslate((w - arrows.width) / 2F, (h - arrows.height) / 2F)
+
     circlePath.reset()
     circlePath.addCircle(cx, cy, circleRadius, Path.Direction.CW)
-
     val drill = when (facing) {
       Facing.FRONT -> 0F
       Facing.BACK  -> maxDrillRadius

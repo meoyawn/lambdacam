@@ -177,40 +177,44 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
 
   val fv = f.flashView()
 
-  f.facingView().facing = facing
-  f.facingView().onClick {
-    when (facing) {
-      Facing.BACK  -> {
-        f.facingView().toFront()
-        facing = Facing.FRONT
+  if (Camera.getNumberOfCameras() > 1) {
+    f.facingView().facing = facing
+    f.facingView().onClick {
+      when (facing) {
+        Facing.BACK  -> {
+          f.facingView().toFront()
+          facing = Facing.FRONT
+        }
+        Facing.FRONT -> {
+          f.facingView().toBack()
+          facing = Facing.BACK
+        }
       }
-      Facing.FRONT -> {
-        f.facingView().toBack()
-        facing = Facing.BACK
+
+      window.setBackgroundDrawableResource(android.R.color.black)
+      tv.animate()
+          .alpha(0F)
+          .setDuration(500)
+          .start()
+      camState = State.CLOSING
+
+      CAMERA_THREAD.execute {
+        cam?.camera?.close()
+        camState = State.CLOSED
+        val c = open(facing, mode, tv)
+        cam = c
+
+        val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
+        val cur = calc(sf, flash)
+        flash = cur?.let { sf[it] }
+
+        MAIN_THREAD.execute {
+          fv?.setFlash(sf, cur)
+        }
       }
     }
-
-    window.setBackgroundDrawableResource(android.R.color.black)
-    tv.animate()
-        .alpha(0F)
-        .setDuration(500)
-        .start()
-    camState = State.CLOSING
-
-    CAMERA_THREAD.execute {
-      cam?.camera?.close()
-      camState = State.CLOSED
-      val c = open(facing, mode, tv)
-      cam = c
-
-      val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
-      val cur = calc(sf, flash)
-      flash = cur?.let { sf[it] }
-
-      MAIN_THREAD.execute {
-        fv?.setFlash(sf, cur)
-      }
-    }
+  } else {
+    f.facingView().visibility = View.GONE
   }
 
   f.shootView().onClick {

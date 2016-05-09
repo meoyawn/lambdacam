@@ -124,7 +124,7 @@ fun _FrameLayout.removeCamButtons() {
 fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to: CamScreen) {
   when (from) {
     is TakenScreen    -> fromPicTaken(f, panelSize)
-    is VideoRecording -> deleteRecording(f, from)
+    is VideoRecording -> deleteRecording(f, from, to)
     is PlayerScreen   -> fromPlayer(f, from, panelSize, to)
     is CropScreen     -> {
       f.cameraTexture().visibility = View.VISIBLE

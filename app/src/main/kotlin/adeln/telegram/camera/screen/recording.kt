@@ -2,6 +2,7 @@ package adeln.telegram.camera.screen
 
 import adeln.telegram.camera.BACKGROUND_THREAD
 import adeln.telegram.camera.CAMERA_THREAD
+import adeln.telegram.camera.CamScreen
 import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Interpolators
@@ -12,9 +13,9 @@ import adeln.telegram.camera.cameraTexture
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.focus
 import adeln.telegram.camera.media.startRecorder
+import adeln.telegram.camera.media.stopRecorder
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.push
-import adeln.telegram.camera.stopRecorder
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
@@ -111,7 +112,7 @@ fun _FrameLayout.removeRecording() {
   removeView(recordDuration())
 }
 
-fun CameraActivity.deleteRecording(f: _FrameLayout, from: VideoRecording) {
+fun CameraActivity.deleteRecording(f: _FrameLayout, from: VideoRecording, to: CamScreen) {
   CAMERA_THREAD.execute {
     benchmark("stop recorder") {
       from.stopRecorder()

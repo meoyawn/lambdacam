@@ -31,8 +31,11 @@ inline fun Context.startRecorder(fc: FacingCamera,
   val file = File(telegramDir(), "${System.currentTimeMillis()}.mp4")
   val (camera, facing) = fc
 
+  camera.stopPreview()
+  camera.parameters = camera.parameters.apply { setRecordingHint(true) }
+  camera.unlock()
+
   val rec = MediaRecorder().apply {
-    camera.unlock()
     setCamera(camera)
     setVideoSource(MediaRecorder.VideoSource.CAMERA)
     setAudioSource(MediaRecorder.AudioSource.CAMCORDER)
@@ -66,4 +69,12 @@ fun MediaRecorder.stopRecorder(): Unit {
   tryTimber { stop() }
   reset()
   release()
+}
+
+fun VideoRecording.stopRecorder() {
+  MAIN_THREAD.removeCallbacks(updater)
+  recorder.stopRecorder()
+  camera.reconnect()
+  camera.parameters = camera.parameters.apply { setRecordingHint(false) }
+  camera.startPreview()
 }

@@ -15,11 +15,11 @@ import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.preparePlayer
+import adeln.telegram.camera.media.stopRecorder
 import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.replace
 import adeln.telegram.camera.resetTo
-import adeln.telegram.camera.stopRecorder
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.view.Gravity

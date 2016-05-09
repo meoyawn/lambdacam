@@ -38,10 +38,3 @@ class PlayerScreen(
     val file: File,
     val player: MediaPlayer
 ) : Screen
-
-
-fun VideoRecording.stopRecorder() {
-  MAIN_THREAD.removeCallbacks(updater)
-  recorder.stopRecorder()
-  camera.reconnect()
-}

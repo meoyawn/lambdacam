@@ -6,12 +6,12 @@ import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.supportedFlashes
 import adeln.telegram.camera.screen.flashView
 import adeln.telegram.camera.screen.startRecording
-import adeln.telegram.camera.screen.stopRecording
 import adeln.telegram.camera.screen.toCamScreen
 import adeln.telegram.camera.screen.toCropScreen
 import adeln.telegram.camera.screen.toPicTaken
 import adeln.telegram.camera.screen.toPlayer
 import adeln.telegram.camera.screen.toRecording
+import adeln.telegram.camera.screen.toStopRecording
 import adeln.telegram.camera.widget.calc
 import android.graphics.Point
 import android.graphics.SurfaceTexture
@@ -32,7 +32,7 @@ fun CameraActivity.dispatch(vg: _FrameLayout, t: Flow.Traversal, tcb: Flow.Trave
     is CropScreen     -> toCropScreen(size, to, vg, from)
     is StartRecording -> startRecording(vg, to)
     is VideoRecording -> toRecording(vg, to)
-    is StopRecording  -> stopRecording(vg, to)
+    is StopRecording  -> toStopRecording(vg, to)
     is PlayerScreen   -> toPlayer(vg, to)
     else              -> error("exhaust")
   }

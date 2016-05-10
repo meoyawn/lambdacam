@@ -31,10 +31,10 @@ import android.widget.ProgressBar
 import android.widget.SeekBar
 import common.android.execute
 import common.animation.animationEnd
-import common.benchmark.benchmark
 import common.context.dipF
 import common.context.drawable
 import common.trycatch.tryOptional
+import common.trycatch.tryTimber
 import flow.Flow
 import org.jetbrains.anko._FrameLayout
 import org.jetbrains.anko.backgroundResource
@@ -94,25 +94,25 @@ fun View.playerTexture(): TextureView = find(R.id.player_texture)
 fun View.playerProgress(): SeekBar = find(R.id.player_progress)
 fun View.playPause(): ImageView = find(R.id.play_pause)
 
-fun stopRecording(vg: _FrameLayout, sr: StopRecording) {
+fun toStopRecording(vg: _FrameLayout, sr: StopRecording) {
   val rec = sr.rec
   CAMERA_THREAD.execute {
-    val s = benchmark("stop and prepare") {
-      rec.stopRecorder()
-      val file = rec.file
-      try {
-        val p = preparePlayer(file)
-        PlayerScreen(file, p)
-      } catch(e: Exception) {
-        file.delete()
-        null
-      }
+    rec.stopRecorder()
+    val file = rec.file
+    val s = tryTimber {
+      val p = preparePlayer(file)
+      PlayerScreen(file, p)
     }
+
+    if (s == null) {
+      file.delete()
+    }
+
     MAIN_THREAD.execute {
       val flow = Flow.get(vg)
-      s?.let {
-        flow.replace(it)
-      } ?: run {
+      if (s != null) {
+        flow.replace(s)
+      } else {
         vg.context.toast(R.string.easy_man)
         flow.goBack()
       }

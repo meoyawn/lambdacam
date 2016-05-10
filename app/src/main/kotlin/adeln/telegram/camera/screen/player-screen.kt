@@ -12,6 +12,7 @@ import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
 import adeln.telegram.camera.media.MimeTypes
+import adeln.telegram.camera.media.Result
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.preparePlayer
@@ -47,6 +48,7 @@ import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.padding
 import org.jetbrains.anko.textureView
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.wrapContent
 
 fun _FrameLayout.addPlayer(h: Int, panelSize: Int) {
@@ -97,12 +99,28 @@ fun stopRecording(vg: _FrameLayout, sr: StopRecording) {
   val rec = sr.rec
 
   CAMERA_THREAD.execute {
-    val p = benchmark("stop and prepare") {
-      rec.stopRecorder()
-      preparePlayer(rec.file)
+    val s = benchmark("stop and prepare") {
+      val r = rec.stopRecorder()
+      val file = rec.file
+      when (r) {
+        Result.SUCCESS -> {
+          val p = preparePlayer(file)
+          PlayerScreen(file, p)
+        }
+        Result.FAILURE -> {
+          file.delete()
+          null
+        }
+      }
     }
     MAIN_THREAD.execute {
-      Flow.get(vg.context).replace(PlayerScreen(rec.file, p))
+      val flow = Flow.get(vg)
+      s?.let {
+        flow.replace(it)
+      } ?: run {
+        vg.context.toast(R.string.easy_man)
+        flow.goBack()
+      }
     }
   }
 

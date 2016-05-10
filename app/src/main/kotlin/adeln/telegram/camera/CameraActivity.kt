@@ -5,6 +5,7 @@ import adeln.telegram.camera.media.FacingCamera
 import adeln.telegram.camera.media.Flash
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.State
+import adeln.telegram.camera.media.applyParams
 import adeln.telegram.camera.media.toString
 import android.app.Activity
 import android.os.Bundle
@@ -22,9 +23,9 @@ class CameraActivity : Activity() {
   @Volatile var flash: Flash? = null
     set(value) {
       field = value
-      value?.let {
-        cam?.camera?.parameters = cam?.camera?.parameters?.apply {
-          flashMode = toString(it)
+      if (value != null && camState == State.OPEN) {
+        cam?.camera?.applyParams {
+          flashMode = toString(value)
         }
       }
     }

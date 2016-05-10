@@ -48,7 +48,7 @@ android {
       signingConfig signingConfigs.debug
     }
     release {
-      minifyEnabled true
+      minifyEnabled false
       shrinkResources true
       proguardFile "proguard.pro"
       signingConfig signingConfigs.debug

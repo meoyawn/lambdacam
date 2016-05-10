@@ -75,20 +75,27 @@ inline fun Context.startRecorder(fc: FacingCamera,
   return VideoRecording(rec, camera, file, updater)
 }
 
-@WorkerThread
-fun MediaRecorder.stopRecorder(): Unit {
-  assertWorkerThread()
-  tryTimber { stop() }
-  reset()
-  release()
+enum class Result {
+  SUCCESS,
+  FAILURE
 }
 
-fun VideoRecording.stopRecorder() {
+@WorkerThread
+fun MediaRecorder.stopRecorder(): Result {
+  assertWorkerThread()
+  val ret = tryTimber { stop() }
+  reset()
+  release()
+  return ret?.let { Result.SUCCESS } ?: Result.FAILURE
+}
+
+fun VideoRecording.stopRecorder(): Result {
   MAIN_THREAD.removeCallbacks(updater)
-  recorder.stopRecorder()
-  camera.reconnect()
-  camera.parameters = camera.parameters.apply { setRecordingHint(false) }
-  whenSdk(23) {
-    camera.startPreview()
+  return recorder.stopRecorder().apply {
+    camera.reconnect()
+    camera.parameters = camera.parameters.apply { setRecordingHint(false) }
+    whenSdk(23) {
+      camera.startPreview()
+    }
   }
 }

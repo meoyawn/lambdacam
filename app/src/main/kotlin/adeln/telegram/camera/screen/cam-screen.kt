@@ -6,6 +6,7 @@ import adeln.telegram.camera.CameraActivity
 import adeln.telegram.camera.CropScreen
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.Gesture
+import adeln.telegram.camera.Interpolators
 import adeln.telegram.camera.LeftRight
 import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.PlayerScreen
@@ -24,6 +25,7 @@ import adeln.telegram.camera.media.FacingCamera
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.SHUTTER
 import adeln.telegram.camera.media.State
+import adeln.telegram.camera.media.applyParams
 import adeln.telegram.camera.media.close
 import adeln.telegram.camera.media.focus
 import adeln.telegram.camera.media.open
@@ -127,6 +129,27 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     is TakenScreen    -> fromPicTaken(f, panelSize)
     is StartRecording -> deleteRecording(f, from)
     is VideoRecording -> deleteRecording(f, from)
+    is StopRecording  -> {
+      f.addCamButtons(panelSize, cam)
+      f.facingView().translationY = panelSize.toFloat()
+      f.facingView().animate()
+          .translationY(0F)
+          .setInterpolator(Interpolators.decelerate)
+          .start()
+      f.shootView().translationY = panelSize.toFloat()
+      f.shootView().animate()
+          .translationY(0F)
+          .setInterpolator(Interpolators.decelerate)
+          .start()
+      f.twoCircles().animate()
+          .alpha(1F)
+          .setInterpolator(Interpolators.decelerate)
+          .start()
+      f.panel().animate()
+          .translationY(0F)
+          .setInterpolator(Interpolators.decelerate)
+          .start()
+    }
     is PlayerScreen   -> fromPlayer(f, from, panelSize, to)
     is CropScreen     -> {
       f.cameraTexture().visibility = View.VISIBLE
@@ -269,7 +292,7 @@ fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {
   f.flashView()?.setFlash(flashes, cur)
 
   CAMERA_THREAD.execute {
-    cam?.camera?.parameters = params?.apply {
+    cam?.camera?.applyParams {
       this.focusMode = mode.focus(supportedFocusModes)
     }
     flash = cur?.let { sf[it] }

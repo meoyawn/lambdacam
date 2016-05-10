@@ -270,6 +270,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
         }
 
         f.shootView().shoot()
+        tv.setOnTouchListener(null)
       }
     }
   }

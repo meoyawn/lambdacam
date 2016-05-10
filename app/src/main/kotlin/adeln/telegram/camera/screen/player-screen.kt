@@ -265,7 +265,7 @@ fun CameraActivity.fromPlayer(vg: _FrameLayout, ps: PlayerScreen, panelSize: Int
     }
   }
 
-  vg.addCamButtons(panelSize, cam)
+  vg.addCamButtons(panelSize)
 
   vg.playerTexture().visibility = View.GONE
   vg.playerProgress().animate()

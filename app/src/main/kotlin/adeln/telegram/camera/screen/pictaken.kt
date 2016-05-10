@@ -189,7 +189,7 @@ fun CameraActivity.fromPicTaken(f: _FrameLayout, panelSize: Int) {
   f.removeView(f.cropView())
 
   cam?.camera?.startPreview()
-  f.addCamButtons(panelSize, cam)
+  f.addCamButtons(panelSize)
 
   cancelDoneJump.setAtRest()
   cancelDoneJump.removeAllListeners()

@@ -21,7 +21,6 @@ import adeln.telegram.camera.circlesView
 import adeln.telegram.camera.flashView
 import adeln.telegram.camera.gestures
 import adeln.telegram.camera.media.Facing
-import adeln.telegram.camera.media.FacingCamera
 import adeln.telegram.camera.media.Mode
 import adeln.telegram.camera.media.SHUTTER
 import adeln.telegram.camera.media.State
@@ -62,7 +61,7 @@ import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.horizontalMargin
 import org.jetbrains.anko.onClick
 
-fun _FrameLayout.addCamButtons(panelSize: Int, cam: FacingCamera?) {
+fun _FrameLayout.addCamButtons(panelSize: Int) {
   val touchableSize = dip(52)
   val navBarSize = context.navBarSizeIfPresent()
 
@@ -130,7 +129,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     is StartRecording -> deleteRecording(f, from)
     is VideoRecording -> deleteRecording(f, from)
     is StopRecording  -> {
-      f.addCamButtons(panelSize, cam)
+      f.addCamButtons(panelSize)
       f.facingView().translationY = panelSize.toFloat()
       f.facingView().animate()
           .translationY(0F)
@@ -156,11 +155,11 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       window.setBackgroundDrawable(null)
       f.removeCrop()
       f.removeView(f.cropView())
-      f.addCamButtons(panelSize, cam)
+      f.addCamButtons(panelSize)
       f.panel().translationY = 0F
       cam?.camera?.startPreview()
     }
-    else              -> f.addCamButtons(panelSize, cam)
+    else              -> f.addCamButtons(panelSize)
   }
 
   val transparent = ctx.color(R.color.transparent_panel)
@@ -284,12 +283,10 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
 fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {
   this.mode = mode
 
-  val params = cam?.camera?.parameters
-  val flashes = supportedFlashes(mode, params?.supportedFlashModes)
-
-  val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
+  val params = tryTimber { cam?.camera?.parameters }
+  val sf = supportedFlashes(mode, params?.supportedFlashModes)
   val cur = calc(sf, flash)
-  f.flashView()?.setFlash(flashes, cur)
+  f.flashView()?.setFlash(sf, cur)
 
   CAMERA_THREAD.execute {
     cam?.camera?.applyParams {

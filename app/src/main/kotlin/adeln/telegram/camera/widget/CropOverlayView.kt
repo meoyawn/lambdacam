@@ -1,5 +1,6 @@
 package adeln.telegram.camera.widget
 
+import adeln.telegram.camera.Constants
 import adeln.telegram.camera.Dimens
 import adeln.telegram.camera.R
 import android.annotation.SuppressLint
@@ -31,7 +32,7 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     alpha = 180
   }
   private val guidelinePaint = Paint().apply {
-    color = ctx.color(R.color.inactive_circle)
+    color = Color.WHITE
     style = Paint.Style.STROKE
     strokeWidth = dipF(1)
     alpha = 0
@@ -105,7 +106,7 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     }
 
     if (pressedSomething()) {
-      animateInt(0, 255) {
+      animateInt(0, Constants.MAX_GUIDELINE_ALPHA) {
         guidelinePaint.alpha = it
         invalidate()
       }
@@ -118,7 +119,7 @@ class CropOverlayView(ctx: Context) : View(ctx) {
 
   private fun onActionUp(): Boolean {
     if (pressedSomething()) {
-      animateInt(255, 0) {
+      animateInt(Constants.MAX_GUIDELINE_ALPHA, 0) {
         guidelinePaint.alpha = it
         invalidate()
       }

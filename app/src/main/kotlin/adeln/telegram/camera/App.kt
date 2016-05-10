@@ -18,6 +18,8 @@ class App : Application() {
       Timber.plant(Timber.DebugTree())
       LeakCanary.install(this)
     }
-    Fabric.with(this, CrashlyticsCore())
+    BACKGROUND_THREAD.execute {
+      Fabric.with(this, CrashlyticsCore())
+    }
   }
 }

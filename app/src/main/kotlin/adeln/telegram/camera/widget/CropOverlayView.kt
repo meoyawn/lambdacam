@@ -58,8 +58,10 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     invalidate()
   }
 
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int): Unit =
-      reset()
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int): Unit {
+    cropRect.set(initialPadding, initialPadding, width - initialPadding, height - initialPadding)
+    cropListener(cropRect)
+  }
 
   override fun onDraw(canvas: Canvas): Unit {
     drawDim(canvas)

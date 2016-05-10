@@ -203,7 +203,12 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
 
   if (Camera.getNumberOfCameras() > 1) {
     f.facingView().facing = facing
+
+    var switching = false
     f.facingView().onClick {
+      if (switching) return@onClick
+      switching = true
+
       when (facing) {
         Facing.BACK  -> {
           f.facingView().toFront()
@@ -234,6 +239,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
 
         MAIN_THREAD.execute {
           fv?.setFlash(sf, cur)
+          switching = false
         }
       }
     }

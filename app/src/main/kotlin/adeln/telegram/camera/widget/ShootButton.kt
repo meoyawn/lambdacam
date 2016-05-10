@@ -18,6 +18,7 @@ import common.animation.animateFloat
 import common.animation.chainDelay
 import common.animation.onUpdate
 import common.context.color
+import common.context.dipF
 import common.graphics.circle
 import org.jetbrains.anko.dip
 
@@ -33,11 +34,11 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
   private val innerRedPaint = sharpPaint(ctx.color(R.color.red))
   private val stopSquarePaint = sharpPaint(ctx.color(R.color.inner_blue))
 
-  private val maxOuterBlueRadius = dip(30).toFloat()
-  private val maxInnerBlueRadius = dip(18).toFloat()
-  private val maxInnerRedRadius = dip(10).toFloat()
-  private val roundCorners = dip(36).toFloat()
-  private val maxStopSquareRadius = dip(15).toFloat()
+  private val maxOuterBlueRadius = dipF(30)
+  private val maxInnerBlueRadius = dipF(18)
+  private val maxInnerRedRadius = dipF(10)
+  private val roundCorners = dipF(36)
+  private val maxStopSquareRadius = dipF(15)
 
   private var innerRedRadius = 0F
   private var stopSquareRadius = roundCorners
@@ -45,7 +46,7 @@ class ShootButton(ctx: Context) : View(ctx), SpringListener {
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    redSpring.addListener(this@ShootButton)
+    redSpring.addListener(this)
   }
 
   override fun onDetachedFromWindow() {

@@ -8,9 +8,6 @@
     <fields>;
 }
 
--keep class com.crashlytics.** { *; }
--keepattributes SourceFile, LineNumberTable, *Annotation*
-
 -assumenosideeffects class timber.log.Timber {
     <methods>;
 }

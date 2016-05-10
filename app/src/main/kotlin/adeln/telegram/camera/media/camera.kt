@@ -13,6 +13,7 @@ import common.android.assertWorkerThread
 import common.benchmark.benchmark
 import org.jetbrains.anko.collections.forEachByIndex
 import timber.log.Timber
+import java.util.ArrayList
 
 // #enumsmatter
 
@@ -48,7 +49,7 @@ private val picFlashes = arrayOf(Flash.AUTO, Flash.ON, Flash.OFF)
 private val videoFlashes = arrayOf(Flash.TORCH, Flash.OFF)
 
 fun supportedFlashes(mode: Mode, flashes: List<String>?): List<Flash> =
-    mutableListOf<Flash>().apply {
+    ArrayList<Flash>(flashes?.size ?: 0).apply {
       val all = if (mode == Mode.PICTURE) picFlashes else videoFlashes
       flashes?.forEachByIndex { s ->
         fromString(s)?.let { f ->
@@ -85,31 +86,35 @@ fun open(facing: Facing, mode: Mode, tv: TextureView): FacingCamera =
       FacingCamera(cam, facing)
     }
 
-fun closest(allSupportSizes: List<Camera.Size>, preferW: Int, preferH: Int): Camera.Size {
-  val r = preferW / preferH.toFloat()
+fun bestRatio(sizes: List<Camera.Size>, w: Int, h: Int): List<Camera.Size> {
+  require(sizes.isNotEmpty())
 
-  var minRatioDiff = Float.MAX_VALUE
-  var minSizeDiff = Int.MAX_VALUE
+  val best = ArrayList<Camera.Size>(sizes.size)
+  var min = Float.MAX_VALUE
+  val r = w / h.toFloat()
 
-  var chosen: Camera.Size? = null
-  allSupportSizes.forEachByIndex { size ->
-    val w = size.width
-    val h = size.height
-
-    val ratioDiff = Math.abs(w / h.toFloat() - r)
-    val sizeDiff = Math.abs(w - preferW) + Math.abs(h - preferH)
-
-    if (ratioDiff <= minRatioDiff && sizeDiff <= minSizeDiff) {
-      minSizeDiff = sizeDiff
-      minRatioDiff = ratioDiff
-      chosen = size
+  sizes.forEachByIndex { size ->
+    val diff = Math.abs(size.width / size.height.toFloat() - r)
+    when {
+      diff == min -> best.add(size)
+      diff < min  -> {
+        best.clear()
+        best.add(size)
+        min = diff
+      }
     }
   }
 
-  Timber.d("choosing ${chosen?.width} x ${chosen?.height}")
+  check(best.isNotEmpty())
 
-  return chosen!!;
+  Timber.d("best size ${best.size}")
+  return best
 }
+
+fun bestSize(sizes: List<Camera.Size>, w: Int, h: Int): Camera.Size =
+    sizes.minBy { Math.abs(it.width - w) + Math.abs(it.height - h) }!!.apply {
+      Timber.d("choosing ${this.width} x ${this.height}")
+    }
 
 fun Camera.close() =
     benchmark("close") {
@@ -134,14 +139,14 @@ data class FacingCamera(
     val facing: Facing
 )
 
-fun Camera.Parameters.config(mode: Mode, preferW: Int, preferH: Int) {
+fun Camera.Parameters.config(mode: Mode, previewW: Int, previewH: Int) {
   set("cam_mode", 1) // don't even ask
   focusMode = mode.focus(supportedFocusModes)
 
-  val preview = closest(supportedPreviewSizes, preferW, preferH)
+  val preview = bestSize(bestRatio(supportedPreviewSizes, previewW, previewH), previewW, previewH)
   setPreviewSize(preview.width, preview.height)
 
-  val picture = closest(supportedPictureSizes, preferW, preferH)
+  val picture = bestSize(bestRatio(supportedPictureSizes, previewW, previewH), previewW, previewH)
   setPictureSize(picture.width, picture.height)
 }
 

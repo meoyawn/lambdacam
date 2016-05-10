@@ -83,8 +83,17 @@ class FlashView(ctx: Context) : View(ctx), ValueAnimator.AnimatorUpdateListener 
   }
 
   private fun prev() =
-      current?.let { if (it == 0) supported.size - 1 else it.dec() }
+      when {
+        hasNext() -> current?.let { if (it == 0) supported.size - 1 else it.dec() }
+        else      -> null
+      }
 
   private fun next() =
-      current?.let { it.inc() % supported.size }
+      when {
+        hasNext() -> current?.let { it.inc() % supported.size }
+        else      -> null
+      }
+
+  private fun hasNext(): Boolean =
+      supported.size > 1
 }

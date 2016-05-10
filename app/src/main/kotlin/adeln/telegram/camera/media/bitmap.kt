@@ -39,7 +39,7 @@ fun decodeRotateCut(facing: Facing, bytes: ByteArray): Bitmap {
     }
   }
 
-  val x = if (info.orientation == 270) Math.abs(orig.width - cutX) else 0
+  val startX = if (info.orientation == 270) Math.abs(orig.width - cutX) else 0
   // TODO reuse bitmaps
-  return Bitmap.createBitmap(orig, x, 0, cutX, orig.height, rotate, false)
+  return Bitmap.createBitmap(orig, startX, 0, cutX, orig.height, rotate, false)
 }

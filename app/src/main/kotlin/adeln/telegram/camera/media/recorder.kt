@@ -89,7 +89,9 @@ fun VideoRecording.stopRecorder(): Unit {
   MAIN_THREAD.removeCallbacks(updater)
   recorder.stopRecorder()
   camera.reconnect()
-  camera.parameters = camera.parameters.apply { setRecordingHint(false) }
+  camera.applyParams {
+    setRecordingHint(false)
+  }
   whenSdk(23) {
     camera.startPreview()
   }

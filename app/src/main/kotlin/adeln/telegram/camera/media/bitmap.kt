@@ -18,8 +18,6 @@ fun decodeReuse(bytes: ByteArray): Bitmap {
     inTempStorage = TEMP_STORAGE
   }
 
-  check(REUSE_POOL.size <= 2)
-
   return REUSE_POOL.firstOrNull { tryTimber { decode(bytes, opts.apply { inBitmap = it }) } != null }
       ?: decode(bytes, opts.apply { inBitmap = null }).apply { REUSE_POOL.add(this) }
 }

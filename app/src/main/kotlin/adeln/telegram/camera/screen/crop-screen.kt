@@ -54,13 +54,12 @@ import org.jetbrains.anko.wrapContent
 import timber.log.Timber
 import java.io.File
 
-fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int) {
+fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int, to: CropScreen) {
   val civ = cropView()
 
   cropOverlayView {
     id = R.id.crop_overlay
     lparams(width = w, height = h)
-    cropListener = { civ.setCropRect(it) }
   }
 
   val ymax = y - context.navBarSizeIfPresent()
@@ -98,7 +97,7 @@ fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int) {
     scrollingListener = object : WheelView.ScrollingListener {
       override fun onAngle(delta: Float, angle: Float) {
         civ.postRotate(delta)
-        civ.zoomOutImage(1F)
+        civ.zoomOutImage(w.toFloat() / to.bitmap.width)
         civ.setImageToWrapCropBounds(false)
         degs.text = formatAngle(angle)
       }
@@ -119,12 +118,6 @@ fun _FrameLayout.addCropScreen(w: Int, h: Int, y: Int) {
     }
     scaleType = ImageView.ScaleType.CENTER_INSIDE
     backgroundResource = R.drawable.clickable_bg
-
-    onClick {
-      civ.postRotate(-90F)
-      civ.setImageToWrapCropBounds()
-      degs.text = formatAngle(civ.currentAngle)
-    }
   }
 
   linearLayout {
@@ -183,6 +176,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 
   val i = Interpolators.decelerate
 
+  val bmp = to.bitmap
   when (from) {
     is TakenScreen -> {
       cancelDoneJump.setAtRest()
@@ -207,10 +201,10 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
           }
           .start()
     }
-    is CropScreen  -> vg.addCropImage(to.bitmap, h, w)
+    is CropScreen  -> vg.addCropImage(bmp, h, w)
   }
 
-  vg.addCropScreen(w, h, size.y)
+  vg.addCropScreen(w, h, size.y, to)
 
   vg.degrees().text = formatAngle(0F)
 
@@ -225,8 +219,10 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
       .setInterpolator(i)
       .start()
 
+  val scale = w.toFloat() / bmp.width
+
   val cropper = vg.cropView()
-  cropper.zoomOutImage(1F)
+  cropper.zoomOutImage(scale)
 
   val overlay = vg.cropOverlay()
   overlay.alpha = 0F
@@ -234,19 +230,35 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
       .alpha(1F)
       .start()
 
+  overlay.cropListener = {
+    cropper.setCropRect(it)
+  }
+
   vg.cancelText().onClick {
     Flow.get(ctx).goBack()
   }
 
   vg.resetText().onClick {
     cropper.postRotate(-vg.wheel().angle())
+    cropper.zoomOutImage(scale)
     cropper.setCropRect(RectF(0F, 0F, w.toFloat(), h.toFloat()))
-    cropper.zoomOutImage(1F)
 
     vg.wheel().setAngle(0F)
     vg.degrees().text = formatAngle(0F)
     overlay.reset()
+
     MAIN_THREAD.postDelayed({ cropper.setCropRect(overlay.cropRect) }, 500)
+  }
+
+  vg.rotate90().onClick {
+    cropper.postRotate(-90F)
+    cropper.zoomOutImage(scale)
+    cropper.setImageToWrapCropBounds()
+
+    val angle = cropper.currentAngle
+    vg.wheel().setAngle(angle)
+
+    vg.degrees().text = formatAngle(angle)
   }
 
   var cropping = false
@@ -276,7 +288,7 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 fun formatAngle(angle: Float): String =
     "${DEGREE_FORMAT.format(angle % 360F)}\u00B0"
 
-fun fromCropScreen(vg: _FrameLayout) {
+fun fromCropScreen(vg: _FrameLayout, from: CropScreen) {
   val i = Interpolators.decelerate
 
   val panel = vg.panel()
@@ -329,6 +341,6 @@ fun fromCropScreen(vg: _FrameLayout) {
   val cv = vg.cropView()
   cv.postRotate(-cv.currentAngle)
   cv.setCropRect(RectF(0F, 0F, cv.width.toFloat(), cv.height.toFloat()))
-  cv.zoomOutImage(1F)
+  cv.zoomOutImage(vg.width.toFloat() / from.bitmap.width)
   cv.setImageToWrapCropBounds(true)
 }

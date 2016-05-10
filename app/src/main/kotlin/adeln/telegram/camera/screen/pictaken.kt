@@ -127,7 +127,7 @@ fun CameraActivity.toPicTaken(panelSize: Int, to: TakenScreen, vg: _FrameLayout,
 
   when (from) {
     is CamScreen  -> fromCamScreen(vg)
-    is CropScreen -> fromCropScreen(vg)
+    is CropScreen -> fromCropScreen(vg, from)
   }
 
   var bitmap: Bitmap? = if (from is CropScreen) from.bitmap else null

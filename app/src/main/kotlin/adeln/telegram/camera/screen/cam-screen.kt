@@ -247,6 +247,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     f.facingView().visibility = View.GONE
   }
 
+  var taking = false
   f.shootView().onClick {
     when (mode) {
       Mode.VIDEO   -> {
@@ -258,14 +259,24 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
         }
       }
       Mode.PICTURE -> {
+        if (taking) return@onClick
+        taking = true
+
         val raw: Camera.PictureCallback? = null
         val jpeg = Camera.PictureCallback { bytes, c ->
+          taking = false
+          f.shootView().setOnClickListener(null)
           Flow.get(ctx).push(TakenScreen(bytes))
         }
 
         CAMERA_THREAD.execute {
-          tryTimber {
+          val took = tryTimber {
             cam?.camera?.takePicture(SHUTTER, raw, jpeg)
+          }
+          if (took == null) {
+            MAIN_THREAD.execute {
+              taking = false
+            }
           }
         }
 

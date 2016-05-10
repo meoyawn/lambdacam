@@ -25,7 +25,9 @@ fun profile(id: Int): CamcorderProfile =
     CamcorderProfile.get(id, preferredQualities.last { CamcorderProfile.hasProfile(id, it) })
 
 inline fun Camera.applyParams(f: Camera.Parameters.() -> Unit): Unit {
-  parameters = parameters.apply(f)
+  tryTimber {
+    parameters = parameters.apply(f)
+  }
 }
 
 @WorkerThread
@@ -75,27 +77,20 @@ inline fun Context.startRecorder(fc: FacingCamera,
   return VideoRecording(rec, camera, file, updater)
 }
 
-enum class Result {
-  SUCCESS,
-  FAILURE
-}
-
 @WorkerThread
-fun MediaRecorder.stopRecorder(): Result {
+fun MediaRecorder.stopRecorder(): Unit {
   assertWorkerThread()
-  val ret = tryTimber { stop() }
+  tryTimber { stop() }
   reset()
   release()
-  return ret?.let { Result.SUCCESS } ?: Result.FAILURE
 }
 
-fun VideoRecording.stopRecorder(): Result {
+fun VideoRecording.stopRecorder(): Unit {
   MAIN_THREAD.removeCallbacks(updater)
-  return recorder.stopRecorder().apply {
-    camera.reconnect()
-    camera.parameters = camera.parameters.apply { setRecordingHint(false) }
-    whenSdk(23) {
-      camera.startPreview()
-    }
+  recorder.stopRecorder()
+  camera.reconnect()
+  camera.parameters = camera.parameters.apply { setRecordingHint(false) }
+  whenSdk(23) {
+    camera.startPreview()
   }
 }

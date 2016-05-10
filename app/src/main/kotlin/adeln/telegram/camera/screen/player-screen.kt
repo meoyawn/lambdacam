@@ -12,7 +12,6 @@ import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
 import adeln.telegram.camera.media.MimeTypes
-import adeln.telegram.camera.media.Result
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
 import adeln.telegram.camera.media.preparePlayer
@@ -97,20 +96,16 @@ fun View.playPause(): ImageView = find(R.id.play_pause)
 
 fun stopRecording(vg: _FrameLayout, sr: StopRecording) {
   val rec = sr.rec
-
   CAMERA_THREAD.execute {
     val s = benchmark("stop and prepare") {
-      val r = rec.stopRecorder()
+      rec.stopRecorder()
       val file = rec.file
-      when (r) {
-        Result.SUCCESS -> {
-          val p = preparePlayer(file)
-          PlayerScreen(file, p)
-        }
-        Result.FAILURE -> {
-          file.delete()
-          null
-        }
+      try {
+        val p = preparePlayer(file)
+        PlayerScreen(file, p)
+      } catch(e: Exception) {
+        file.delete()
+        null
       }
     }
     MAIN_THREAD.execute {

@@ -11,6 +11,7 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
+import common.animation.animateInt
 import common.context.color
 import common.context.dipF
 import common.graphics.component1
@@ -33,6 +34,7 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     color = ctx.color(R.color.inactive_circle)
     style = Paint.Style.STROKE
     strokeWidth = dipF(1)
+    alpha = 0
   }
   private val borderPaint = Paint().apply {
     color = ctx.color(R.color.inactive_circle)
@@ -56,7 +58,8 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     invalidate()
   }
 
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) = reset()
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int): Unit =
+      reset()
 
   override fun onDraw(canvas: Canvas): Unit {
     drawDim(canvas)
@@ -100,9 +103,30 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     }
 
     if (pressedSomething()) {
-      invalidate()
+      animateInt(0, 255) {
+        guidelinePaint.alpha = it
+        invalidate()
+      }
+          .setDuration(200)
+          .start()
     }
 
+    return true
+  }
+
+  private fun onActionUp(): Boolean {
+    if (pressedSomething()) {
+      animateInt(255, 0) {
+        guidelinePaint.alpha = it
+        invalidate()
+      }
+          .setDuration(200)
+          .start()
+
+      pressedCorner = null
+      pressedInside = null
+      cropListener(cropRect)
+    }
     return true
   }
 
@@ -150,16 +174,6 @@ class CropOverlayView(ctx: Context) : View(ctx) {
     return true
   }
 
-  private fun onActionUp(): Boolean {
-    if (pressedSomething()) {
-      pressedCorner = null
-      pressedInside = null
-      cropListener(cropRect)
-      invalidate()
-    }
-    return true
-  }
-
   private fun pressedSomething(): Boolean =
       pressedInside != null || pressedCorner != null
 
@@ -176,25 +190,23 @@ class CropOverlayView(ctx: Context) : View(ctx) {
   }
 
   private fun drawGuidelines(canvas: Canvas) {
-    if (pressedSomething()) {
-      val (left, top, right, bottom) = cropRect
+    val (left, top, right, bottom) = cropRect
 
-      // Draw vertical guidelines.
-      val oneThirdCropWidth = cropRect.width() / 3
+    // Draw vertical guidelines.
+    val oneThirdCropWidth = cropRect.width() / 3
 
-      val x1 = left + oneThirdCropWidth
-      canvas.drawLine(x1, top, x1, bottom, guidelinePaint)
-      val x2 = right - oneThirdCropWidth
-      canvas.drawLine(x2, top, x2, bottom, guidelinePaint)
+    val x1 = left + oneThirdCropWidth
+    canvas.drawLine(x1, top, x1, bottom, guidelinePaint)
+    val x2 = right - oneThirdCropWidth
+    canvas.drawLine(x2, top, x2, bottom, guidelinePaint)
 
-      // Draw horizontal guidelines.
-      val oneThirdCropHeight = cropRect.height() / 3F
+    // Draw horizontal guidelines.
+    val oneThirdCropHeight = cropRect.height() / 3F
 
-      val y1 = top + oneThirdCropHeight
-      canvas.drawLine(left, y1, right, y1, guidelinePaint)
-      val y2 = bottom - oneThirdCropHeight
-      canvas.drawLine(left, y2, right, y2, guidelinePaint)
-    }
+    val y1 = top + oneThirdCropHeight
+    canvas.drawLine(left, y1, right, y1, guidelinePaint)
+    val y2 = bottom - oneThirdCropHeight
+    canvas.drawLine(left, y2, right, y2, guidelinePaint)
   }
 
   private fun drawCorners(canvas: Canvas): Unit {

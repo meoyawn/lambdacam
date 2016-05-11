@@ -11,6 +11,7 @@ import adeln.telegram.camera.MAIN_THREAD
 import adeln.telegram.camera.PlayerScreen
 import adeln.telegram.camera.R
 import adeln.telegram.camera.StopRecording
+import adeln.telegram.camera.media.Facing
 import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
@@ -20,6 +21,7 @@ import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
 import adeln.telegram.camera.replace
 import adeln.telegram.camera.resetTo
+import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.view.Gravity
@@ -101,7 +103,7 @@ fun toStopRecording(vg: _FrameLayout, sr: StopRecording) {
     val file = rec.file
     val s = tryTimber {
       val p = preparePlayer(file)
-      PlayerScreen(file, p)
+      PlayerScreen(rec.facingCamera.facing, file, p)
     }
 
     if (s == null) {
@@ -202,6 +204,10 @@ fun toPlayer(vg: _FrameLayout, ps: PlayerScreen) {
     override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
   })
 
+  vg.playerTexture().setTransform(Matrix().apply {
+    if (ps.facing == Facing.FRONT)
+      postScale(-1F, 1F, vg.width / 2F, vg.height / 2F)
+  })
   vg.playerTexture().surfaceTextureListener = surfaceListener(player, upd, playPause)
 
   vg.cancel().onClick {

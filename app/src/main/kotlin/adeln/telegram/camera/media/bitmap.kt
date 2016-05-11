@@ -44,9 +44,8 @@ fun decodeRotateCut(facing: Facing, bytes: ByteArray): Bitmap {
 
   val m = Matrix().apply {
     postRotate(info.orientation.toFloat())
-    if (facing == Facing.FRONT) {
+    if (facing == Facing.FRONT)
       postScale(-1F, 1F)
-    }
   }
 
   val x = startX

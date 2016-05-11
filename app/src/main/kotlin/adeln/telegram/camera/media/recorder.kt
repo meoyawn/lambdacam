@@ -74,7 +74,7 @@ inline fun Context.startRecorder(fc: FacingCamera,
     }
   }
 
-  return VideoRecording(rec, camera, file, updater)
+  return VideoRecording(rec, fc, file, updater)
 }
 
 @WorkerThread
@@ -88,11 +88,11 @@ fun MediaRecorder.stopRecorder(): Unit {
 fun VideoRecording.stopRecorder(): Unit {
   MAIN_THREAD.removeCallbacks(updater)
   recorder.stopRecorder()
-  camera.reconnect()
-  camera.applyParams {
+  facingCamera.camera.reconnect()
+  facingCamera.camera.applyParams {
     setRecordingHint(false)
   }
   whenSdk(23) {
-    camera.startPreview()
+    facingCamera.camera.startPreview()
   }
 }

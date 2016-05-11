@@ -201,12 +201,14 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
 
   val fv = f.flashView()
 
+  var taking = false
+  var switching = false
+
   if (Camera.getNumberOfCameras() > 1) {
     f.facingView().facing = facing
 
-    var switching = false
     f.facingView().onClick {
-      if (switching) return@onClick
+      if (switching || taking) return@onClick
       switching = true
 
       when (facing) {
@@ -247,7 +249,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
     f.facingView().visibility = View.GONE
   }
 
-  var taking = false
+
   f.shootView().onClick {
     when (mode) {
       Mode.VIDEO   -> {
@@ -259,7 +261,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
         }
       }
       Mode.PICTURE -> {
-        if (taking) return@onClick
+        if (switching || taking) return@onClick
         taking = true
 
         val raw: Camera.PictureCallback? = null

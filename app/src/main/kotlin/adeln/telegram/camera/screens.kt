@@ -3,7 +3,6 @@ package adeln.telegram.camera
 import adeln.telegram.camera.media.Facing
 import adeln.telegram.camera.media.FacingCamera
 import android.graphics.Bitmap
-import android.hardware.Camera
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import java.io.File
@@ -40,7 +39,7 @@ class StopRecording(
 ) : Screen
 
 class PlayerScreen(
-    val facing:Facing,
+    val facing: Facing,
     val file: File,
     val player: MediaPlayer
 ) : Screen

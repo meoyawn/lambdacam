@@ -181,11 +181,7 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
         setCameraParams(f, Mode.VIDEO)
       }
       it == Gesture.LONG_TAP                           -> {
-        if (mode == Mode.PICTURE) {
-          f.twoCircles().moveRight()
-        }
-        setCameraParams(f, Mode.VIDEO)
-        Flow.get(ctx).push(StartRecording(null))
+        onLongTap(f)
       }
     }
   }
@@ -287,6 +283,10 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       }
     }
   }
+  f.shootView().setOnLongClickListener {
+    onLongTap(f)
+    true
+  }
 
   val sf = supportedFlashes(mode, cam?.camera?.parameters?.supportedFlashModes)
   val cur = calc(sf, flash)
@@ -298,6 +298,14 @@ fun CameraActivity.toCamScreen(from: Screen, panelSize: Int, f: _FrameLayout, to
       setNext()?.let { flash = it }
     }
   }
+}
+
+private fun CameraActivity.onLongTap(f: _FrameLayout) {
+  if (mode == Mode.PICTURE) {
+    f.twoCircles().moveRight()
+  }
+  setCameraParams(f, Mode.VIDEO)
+  Flow.get(ctx).push(StartRecording(null))
 }
 
 fun CameraActivity.setCameraParams(f: _FrameLayout, mode: Mode) {

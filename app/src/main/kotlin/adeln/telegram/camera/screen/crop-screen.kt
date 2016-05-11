@@ -15,6 +15,7 @@ import adeln.telegram.camera.cropOverlayView
 import adeln.telegram.camera.media.MimeTypes
 import adeln.telegram.camera.media.notifyGallery
 import adeln.telegram.camera.media.open
+import adeln.telegram.camera.media.removeFromPool
 import adeln.telegram.camera.media.telegramDir
 import adeln.telegram.camera.navBarSizeIfPresent
 import adeln.telegram.camera.panel
@@ -267,6 +268,8 @@ fun CameraActivity.toCropScreen(size: Point, to: CropScreen, vg: _FrameLayout, f
 
     cropping = true
     val f = File(telegramDir(), "${System.currentTimeMillis()}.jpg")
+    removeFromPool(to.bitmap)
+
     cropper.cropAndSaveImage(
         Constants.COMPRESSION_FORMAT,
         Constants.COMPRESSION_QUALITY,

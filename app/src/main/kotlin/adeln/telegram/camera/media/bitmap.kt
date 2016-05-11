@@ -15,6 +15,9 @@ private val TEMP_STORAGE = ByteArray(16 * 1024)
 private val DECODE_POOL = ArrayList<Bitmap>()
 private val TRANSFORM_POOL = ArrayList<Bitmap>()
 
+fun removeFromPool(b: Bitmap) =
+    TRANSFORM_POOL.remove(b)
+
 fun decodeReuse(bytes: ByteArray): Bitmap {
   val opts = BitmapFactory.Options().apply {
     inSampleSize = 1

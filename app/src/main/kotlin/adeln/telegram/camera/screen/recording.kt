@@ -40,7 +40,7 @@ fun leadingZero(num: Long): String =
     }
 
 fun minsSecs(time: Long): String =
-    "${leadingZero(time / 60000)}:${leadingZero((time / 1000 % 100))}"
+    "${leadingZero(time / 60000)}:${leadingZero((time / 1000 % 60))}"
 
 fun CameraActivity.startRecording(vg: _FrameLayout, to: StartRecording): Unit {
   val dur = vg.run {

@@ -1,0 +1,4 @@
+lambdacam
+=========
+
+Installation: `./gradlew installRelease`
